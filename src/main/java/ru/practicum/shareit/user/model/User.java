@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 public class User {
     private Long id;
     private String name;
-    @NotNull
-    @Email
+    @NotNull (message = "В описании пользователя отсутвует email")
+    @Email (message = "В описании пользователя представлен некорректный email")
     private String email;
 }

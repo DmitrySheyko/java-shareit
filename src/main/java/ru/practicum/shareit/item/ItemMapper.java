@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+import ru.practicum.shareit.interfaces.Mappers;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
@@ -9,8 +10,10 @@ import javax.validation.Valid;
 
 @Component
 @Validated
-public class ItemMapper {
-    public static ItemDto toItemDto(Item item) {
+public class ItemMapper implements Mappers<ItemDto, Item> {
+
+    @Override
+    public ItemDto toDto(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -20,8 +23,10 @@ public class ItemMapper {
                 .request(item.getRequest())
                 .build();
     }
-@Valid
-    public Item toItem(ItemDto itemDto) {
+
+    @Override
+    @Valid
+    public Item toEntity(ItemDto itemDto) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
