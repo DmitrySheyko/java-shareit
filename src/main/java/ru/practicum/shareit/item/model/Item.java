@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.request.model.ItemRequest;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 /**
  * TODO Sprint add-controllers.
  */
@@ -13,9 +17,13 @@ import ru.practicum.shareit.request.model.ItemRequest;
 @AllArgsConstructor
 public class Item {
     private Long id;
+    @NotBlank (message = "Имя не должно быть пустым")
     private String name;
+    @NotBlank (message = "Описание не должно быть пустым")
     private String description;
-    private boolean available;
+    @NotNull(message = "Должно быть указано доступен ли объект: true/false")
+    private Boolean available;
+    @NotNull(message = "Должен быть указан UserId владельца")
     private Long owner;
     private ItemRequest request;
 }

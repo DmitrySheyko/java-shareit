@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ValidationException.class)
     public String handlerOfValidationException(final ValidationException e) {
         return String.format("Ошибка. %s", e.getMessage());
@@ -72,6 +72,12 @@ public class ErrorHandler {
 //    public String handlerOfResponseStatusException(final ResponseStatusException e) {
 //        return String.format("Ошибка. %s", e.getMessage());
 //    }
+
+    @ExceptionHandler(ConflictErrorException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handlerOfConflictErrorException(final ConflictErrorException e){
+        return String.format("Ошибка. %s", e.getMessage());
+    }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

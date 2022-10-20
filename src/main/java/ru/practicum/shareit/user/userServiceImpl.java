@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.ConflictErrorException;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -27,7 +28,7 @@ public class userServiceImpl implements UserService {
             return userMapper.toUserDto(newUser);
         } else {
             log.warn(String.format("Пользователь с email=%s уже существует.", user.getEmail()));
-            throw new ValidationException(String.format("Пользователь с email=%s уже существует.", user.getEmail()));
+            throw new ConflictErrorException(String.format("Пользователь с email=%s уже существует.", user.getEmail()));
         }
     }
 
@@ -40,7 +41,7 @@ public class userServiceImpl implements UserService {
             }
             if (userStorage.checkIsUserEmailInStorage(userForUpdate)) {
                 log.warn(String.format("Пользователь с email=%s уже существует.", userForUpdate.getEmail()));
-                throw new ValidationException(String.format("Пользователь с email=%s уже существует.", userForUpdate.getEmail()));
+                throw new ConflictErrorException(String.format("Пользователь с email=%s уже существует.", userForUpdate.getEmail()));
             }
             if (userForUpdate.getEmail() == null) {
                 userForUpdate.setEmail(userFromStorage.getEmail());
