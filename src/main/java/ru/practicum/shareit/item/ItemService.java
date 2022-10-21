@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.interfaces.Mappers;
 import ru.practicum.shareit.interfaces.Services;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -31,16 +30,10 @@ public class ItemService implements Services<ItemDto> {
             log.warn(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
             throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
         }
-        try {
-            Item addedItem = itemStorage.add(itemMapper.toEntity(itemDto));
-            ItemDto addedItemDto = itemMapper.toDto(addedItem);
-            log.info(String.format("Объект id=%s успешно добавлен", addedItemDto.getId()));
-            System.out.println(addedItem);
-            System.out.println(addedItemDto);
-            return addedItemDto;
-        } catch (NullPointerException e) {
-            throw new ValidationException(e.getMessage());
-        }
+        Item addedItem = itemStorage.add(itemMapper.toEntity(itemDto));
+        ItemDto addedItemDto = itemMapper.toDto(addedItem);
+        log.info(String.format("Объект id=%s успешно добавлен", addedItemDto.getId()));
+        return addedItemDto;
     }
 
     @Override

@@ -6,7 +6,6 @@ import lombok.Data;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -17,9 +16,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class Item {
     private Long id;
-    @NotBlank (message = "Имя не должно быть пустым")
+    @NotBlank(message = "Имя не должно быть пустым")
     private String name;
-    @NotBlank (message = "Описание не должно быть пустым")
+    @NotBlank(message = "Описание не должно быть пустым")
     private String description;
     @NotNull(message = "Должно быть указано доступен ли объект: true/false")
     private Boolean available;
