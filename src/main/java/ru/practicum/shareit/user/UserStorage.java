@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Repository ("userStorage")
+@Repository("userStorage")
 @AllArgsConstructor
 public class UserStorage implements Storages<User> {
     private Map<Long, User> mapOfUsers;
@@ -40,7 +40,7 @@ public class UserStorage implements Storages<User> {
         return new ArrayList<User>(mapOfUsers.values());
     }
 
-    public String delete (Long userId){
+    public String delete(Long userId) {
         mapOfUsers.remove(userId);
         return String.format("Пользователь id=%s успешно удален", userId);
     }
@@ -60,18 +60,19 @@ public class UserStorage implements Storages<User> {
     public Boolean checkIsUserEmailInStorage(User user) {
         return mapOfUsers.values().stream()
                 .map(User::getEmail)
-                .anyMatch(email-> email.equals(user.getEmail()));
+                .anyMatch(email -> email.equals(user.getEmail()));
     }
+
     public Boolean checkIsUserEmailInStorage(String email) {
         return mapOfUsers.values().stream()
                 .map(User::getEmail)
                 .anyMatch(emailFromStorage -> emailFromStorage.equals(email));
     }
 
-        public Boolean checkIsUserEmailInStorage(String email, Long userId) {
-            return mapOfUsers.values().stream()
-                    .filter(user -> !(user.getId().equals(userId)))
-                    .map(User::getEmail)
-                    .anyMatch(emailFromStorage-> emailFromStorage.equals(email));
+    public Boolean checkIsUserEmailInStorage(String email, Long userId) {
+        return mapOfUsers.values().stream()
+                .filter(user -> !(user.getId().equals(userId)))
+                .map(User::getEmail)
+                .anyMatch(emailFromStorage -> emailFromStorage.equals(email));
     }
 }

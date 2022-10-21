@@ -44,7 +44,8 @@ public class UserService implements Services<UserDto> {
             userDtoForUpdate.setEmail(userFromStorage.getEmail());
         } else if (userStorage.checkIsUserEmailInStorage(userDtoForUpdate.getEmail(), userDtoForUpdate.getId())) {
             log.warn(String.format("Пользователь с email=%s уже существует.", userDtoForUpdate.getEmail()));
-            throw new ConflictErrorException(String.format("Пользователь с email=%s уже существует.", userDtoForUpdate.getEmail()));
+            throw new ConflictErrorException(String.format("Пользователь с email=%s уже существует.",
+                    userDtoForUpdate.getEmail()));
         }
         if (userDtoForUpdate.getName() == null) {
             userDtoForUpdate.setName(userFromStorage.getName());

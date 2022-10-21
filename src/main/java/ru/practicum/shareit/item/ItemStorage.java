@@ -61,10 +61,6 @@ public class ItemStorage implements Storages<Item> {
         return String.format("Пользователь id=%s успешно удален.", userId);
     }
 
-    private Long generateItemId() {
-        return ++itemId;
-    }
-
     @Override
     public Boolean checkIsObjectInStorage(Item item) {
         return mapOfItems.containsValue(item);
@@ -73,5 +69,9 @@ public class ItemStorage implements Storages<Item> {
     @Override
     public Boolean checkIsObjectInStorage(Long itemId) {
         return mapOfItems.containsKey(itemId);
+    }
+
+    private Long generateItemId() {
+        return ++itemId;
     }
 }

@@ -23,7 +23,7 @@ public class UserMapper implements Mappers<UserDto, User> {
 
     @Override
     @Valid
-    public User toEntity (UserDto userDto) {
+    public User toEntity(UserDto userDto) {
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())
