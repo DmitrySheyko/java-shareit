@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.interfaces.Mappers;
@@ -14,6 +15,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,18 +55,12 @@ public class ItemService implements Services<ItemDto> {
                     itemDtoForUpdate.getOwner(), itemDtoForUpdate.getId()));
         }
         Item itemFromStorage = itemStorage.getById(itemDtoForUpdate.getId());
-        if (itemDtoForUpdate.getId() == null) {
-            itemDtoForUpdate.setId(itemDtoForUpdate.getId());
-        }
-        if (itemDtoForUpdate.getName() == null) {
-            itemDtoForUpdate.setName(itemFromStorage.getName());
-        }
-        if (itemDtoForUpdate.getDescription() == null) {
-            itemDtoForUpdate.setDescription(itemFromStorage.getDescription());
-        }
-        if (itemDtoForUpdate.getAvailable() == null) {
-            itemDtoForUpdate.setAvailable(itemFromStorage.getAvailable());
-        }
+        itemDtoForUpdate.setId(Optional.ofNullable(itemDtoForUpdate.getId()).orElse(itemFromStorage.getId()));
+        itemDtoForUpdate.setName(Optional.ofNullable(itemDtoForUpdate.getName()).orElse(itemFromStorage.getName()));
+        itemDtoForUpdate.setDescription(Optional.ofNullable(itemDtoForUpdate.getDescription())
+                .orElse(itemFromStorage.getDescription()));
+        itemDtoForUpdate.setAvailable(Optional.ofNullable(itemDtoForUpdate.getAvailable())
+                .orElse(itemFromStorage.getAvailable()));
         itemStorage.update(itemMapper.toEntity(itemDtoForUpdate));
         return itemDtoForUpdate;
     }
@@ -97,7 +93,7 @@ public class ItemService implements Services<ItemDto> {
     }
 
     public List<ItemDto> search(String text) {
-        if (text.isBlank()) {
+        if (StringUtils.isBlank(text)) {
             return Collections.emptyList();
         }
         List<Item> listOfItems = itemStorage.search(text);

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.interfaces.Storages;
 import ru.practicum.shareit.item.model.Item;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Repository
 @AllArgsConstructor
 public class ItemStorage implements Storages<Item> {
-    Map<Long, Item> mapOfItems;
+    private final Map<Long, Item> mapOfItems;
     private static long itemId = 0L;
 
     @Override
@@ -49,9 +50,10 @@ public class ItemStorage implements Storages<Item> {
     }
 
     public List<Item> search(String text) {
+
         return mapOfItems.values().stream()
                 .filter(item -> item.getAvailable().equals(true))
-                .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .filter(item -> StringUtils.containsIgnoreCase(item.getDescription(), text))
                 .collect(Collectors.toList());
     }
 

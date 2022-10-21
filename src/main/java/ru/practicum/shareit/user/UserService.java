@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,9 +48,7 @@ public class UserService implements Services<UserDto> {
             throw new ConflictErrorException(String.format("Пользователь с email=%s уже существует.",
                     userDtoForUpdate.getEmail()));
         }
-        if (userDtoForUpdate.getName() == null) {
-            userDtoForUpdate.setName(userFromStorage.getName());
-        }
+        userDtoForUpdate.setName(Optional.ofNullable(userDtoForUpdate.getName()).orElse(userFromStorage.getName()));
         User userForUpdate = userMapper.toEntity(userDtoForUpdate);
         User updatedUser = userStorage.update(userForUpdate);
         log.info(String.format("Пользователь id=%s успешно обновлен.", userDtoForUpdate.getId()));

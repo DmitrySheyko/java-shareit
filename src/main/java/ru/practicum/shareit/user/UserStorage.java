@@ -12,7 +12,7 @@ import java.util.Map;
 @Repository("userStorage")
 @AllArgsConstructor
 public class UserStorage implements Storages<User> {
-    private Map<Long, User> mapOfUsers;
+    private final Map<Long, User> mapOfUsers;
     private static Long userId = 0L;
 
     @Override
@@ -37,7 +37,7 @@ public class UserStorage implements Storages<User> {
 
     @Override
     public List<User> getAll() {
-        return new ArrayList<User>(mapOfUsers.values());
+        return new ArrayList<>(mapOfUsers.values());
     }
 
     public String delete(Long userId) {
