@@ -21,7 +21,6 @@ public class UserController implements Controllers<UserDto> {
     @Override
     @PostMapping
     public UserDto add(@RequestBody @Valid UserDto userDto) {
-        System.out.println("controller");
         return services.add(userDto);
     }
 

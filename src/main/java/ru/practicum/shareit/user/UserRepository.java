@@ -6,7 +6,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@Repository
+//@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
 }

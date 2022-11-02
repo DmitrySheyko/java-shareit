@@ -24,7 +24,7 @@ public class User {
 
     @NotNull(message = "В описании пользователя отсутвует email")
     @Email(message = "В описании пользователя представлен некорректный email")
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Override
