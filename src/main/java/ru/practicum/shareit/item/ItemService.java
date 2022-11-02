@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ru.practicum.shareit.interfaces.Services;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.interfaces.Storages;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collections;
@@ -21,17 +23,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
+//@RequiredArgsConstructor
 public class ItemService implements Services<ItemDto> {
     private final ItemStorage itemStorage;
-    private final Storages<User> userStorage;
+//    private final UserRepository userRepository;
     private final Mappers<ItemDto, Item> itemMapper;
 
     @Override
     public ItemDto add(ItemDto itemDto) {
-        if (!userStorage.checkIsObjectInStorage(itemDto.getOwner())) {
-            log.warn(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
-            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
-        }
+//        if (!userStorage.checkIsObjectInStorage(itemDto.getOwner())) {
+//            log.warn(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
+//            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
+//        }
         Item addedItem = itemStorage.add(itemMapper.toEntity(itemDto));
         ItemDto addedItemDto = itemMapper.toDto(addedItem);
         log.info(String.format("Объект id=%s успешно добавлен", addedItemDto.getId()));
@@ -40,10 +43,10 @@ public class ItemService implements Services<ItemDto> {
 
     @Override
     public ItemDto update(ItemDto itemDtoForUpdate) {
-        if (!userStorage.checkIsObjectInStorage(itemDtoForUpdate.getOwner())) {
-            log.warn(String.format("Пользователь userId=%s не найден", itemDtoForUpdate.getOwner()));
-            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDtoForUpdate.getOwner()));
-        }
+//        if (!userStorage.checkIsObjectInStorage(itemDtoForUpdate.getOwner())) {
+//            log.warn(String.format("Пользователь userId=%s не найден", itemDtoForUpdate.getOwner()));
+//            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDtoForUpdate.getOwner()));
+//        }
         if (!itemStorage.checkIsObjectInStorage(itemDtoForUpdate.getId())) {
             log.warn(String.format("Объект itemId=%s не найден", itemDtoForUpdate.getId()));
             throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemDtoForUpdate.getId()));
