@@ -90,4 +90,12 @@ public class UserService implements Services<UserDto> {
             throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
         }
     }
+
+    public boolean checkIsObjectInStorage(Long userId){
+        return userRepository.existsById(userId);
+    }
+
+    public boolean checkIsObjectInStorage(User user){
+        return userRepository.existsById(user.getId());
+    }
 }
