@@ -48,7 +48,7 @@ public class UserService implements Services<UserDto> {
         }
         userDtoForUpdate.setName(Optional.ofNullable(userDtoForUpdate.getName()).orElse(userFromStorage.getName()));
         User userForUpdate = userMapper.toEntity(userDtoForUpdate);
-        User updatedUser = userRepository.save(userForUpdate); //  update(userForUpdate);
+        User updatedUser = userRepository.save(userForUpdate);
         log.info(String.format("Пользователь id=%s успешно обновлен.", userDtoForUpdate.getId()));
         return userMapper.toDto(updatedUser);
     }
