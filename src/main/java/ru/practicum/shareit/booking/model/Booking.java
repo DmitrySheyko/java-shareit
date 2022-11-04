@@ -40,7 +40,7 @@ public class Booking {
     private Long itemId;
 
     @Column(name = "booker_id", nullable = false)
-    private Long booker;
+    private Long bookerId;
 
     @Column(name = "status", nullable = false)
     private BookingStatus status;
@@ -50,11 +50,27 @@ public class Booking {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Booking booking = (Booking) o;
-        return Objects.equals(id, booking.id) && Objects.equals(start, booking.start) && Objects.equals(end, booking.end) && Objects.equals(itemId, booking.itemId) && Objects.equals(booker, booking.booker) && status == booking.status;
+        return Objects.equals(id, booking.id) && Objects.equals(start, booking.start)
+                && Objects.equals(end, booking.end)
+                && Objects.equals(itemId, booking.itemId)
+                && Objects.equals(bookerId, booking.bookerId)
+                && status == booking.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, start, end, itemId, booker, status);
+        return Objects.hash(id, start, end, itemId, bookerId, status);
+    }
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "id=" + id +
+                ", start=" + start +
+                ", end=" + end +
+                ", itemId=" + itemId +
+                ", bookerId=" + bookerId +
+                ", status=" + status +
+                '}';
     }
 }

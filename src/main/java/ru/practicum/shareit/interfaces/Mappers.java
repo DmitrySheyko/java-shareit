@@ -2,7 +2,7 @@ package ru.practicum.shareit.interfaces;
 
 public interface Mappers<T, E> {
 
-    T toDto(E obj);
+    T toDtoForOtherUsers(E obj);
 
-    E toEntity(T objDto);
+    E DtoForOtherUsersToEntity(T objDto);
 }

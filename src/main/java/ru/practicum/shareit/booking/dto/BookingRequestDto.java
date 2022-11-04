@@ -3,20 +3,16 @@ package ru.practicum.shareit.booking.dto;
 import lombok.*;
 import ru.practicum.shareit.booking.model.BookingStatus;
 
-
-/**
- * TODO Sprint add-bookings.
- */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingDto {
+public class BookingRequestDto {
     private Long id;
+    private Long bookerId;
+    private Long itemId;
     private String start;
     private String end;
-    private Long itemId;
-    private Long booker;
     private BookingStatus status;
 }

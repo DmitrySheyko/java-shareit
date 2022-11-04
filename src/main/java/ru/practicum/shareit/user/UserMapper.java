@@ -13,7 +13,7 @@ import javax.validation.Valid;
 public class UserMapper implements Mappers<UserDto, User> {
 
     @Override
-    public UserDto toDto(User user) {
+    public UserDto toDtoForOtherUsers(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -23,7 +23,7 @@ public class UserMapper implements Mappers<UserDto, User> {
 
     @Override
     @Valid
-    public User toEntity(UserDto userDto) {
+    public User DtoForOtherUsersToEntity(UserDto userDto) {
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())

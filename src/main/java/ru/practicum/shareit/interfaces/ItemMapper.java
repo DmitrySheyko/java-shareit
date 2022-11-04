@@ -1,12 +1,12 @@
 package ru.practicum.shareit.interfaces;
 
 //import org.mapstruct.Mapper;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
 import ru.practicum.shareit.item.model.Item;
 
 //@Mapper(componentModel = "spring")
 public interface ItemMapper {
-    Item toItem(ItemDto itemDto);
+    Item toItem(ItemDtoForOtherUsers itemDtoForOtherUsers);
 
-    ItemDto toItemDto(Item item);
+    ItemDtoForOtherUsers toItemDto(Item item);
 }

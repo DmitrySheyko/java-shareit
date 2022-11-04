@@ -22,10 +22,10 @@ public class UserService implements Services<UserDto> {
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = userMapper.toEntity(userDto);
+        User user = userMapper.DtoForOtherUsersToEntity(userDto);
         User createdUser = userRepository.save(user);
         log.info(String.format("Пользователь id=%s успешно добавлен.", createdUser.getId()));
-        return userMapper.toDto(createdUser);
+        return userMapper.toDtoForOtherUsers(createdUser);
     }
 
     @Override
@@ -47,10 +47,10 @@ public class UserService implements Services<UserDto> {
             userDtoForUpdate.setEmail(userFromStorage.getEmail());
         }
         userDtoForUpdate.setName(Optional.ofNullable(userDtoForUpdate.getName()).orElse(userFromStorage.getName()));
-        User userForUpdate = userMapper.toEntity(userDtoForUpdate);
+        User userForUpdate = userMapper.DtoForOtherUsersToEntity(userDtoForUpdate);
         User updatedUser = userRepository.save(userForUpdate);
         log.info(String.format("Пользователь id=%s успешно обновлен.", userDtoForUpdate.getId()));
-        return userMapper.toDto(updatedUser);
+        return userMapper.toDtoForOtherUsers(updatedUser);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class UserService implements Services<UserDto> {
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 log.info(String.format("Получены данные пользователя id=%s.", userId));
-                return userMapper.toDto(user);
+                return userMapper.toDtoForOtherUsers(user);
             } else {
                 log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
                 throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
@@ -75,7 +75,7 @@ public class UserService implements Services<UserDto> {
     public List<UserDto> getAll() {
         List<User> listOfUsers = userRepository.findAll();
         log.info("Получены список всех пользователей");
-        return listOfUsers.stream().map(userMapper::toDto).collect(Collectors.toList());
+        return listOfUsers.stream().map(userMapper::toDtoForOtherUsers).collect(Collectors.toList());
     }
 
     @Override

@@ -2,7 +2,9 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.interfaces.Dto;
+import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
+import ru.practicum.shareit.item.dto.ItemDtoForOwner;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
@@ -17,31 +19,34 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto add(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
-        itemDto.setOwner(userId);
-        return itemService.add(itemDto);
+    public ItemDtoForOtherUsers add(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDtoForOtherUsers itemDtoForOtherUsers) {
+        itemDtoForOtherUsers.setOwner(userId);
+        return itemService.add(itemDtoForOtherUsers);
     }
 
     @PatchMapping("/{id}")
-    public ItemDto update(@PathVariable(value = "id") Long itemId, @RequestBody ItemDto itemDtoForUpdate,
-                          @RequestHeader("X-Sharer-User-Id") Long userId) {
-        itemDtoForUpdate.setId(itemId);
-        itemDtoForUpdate.setOwner(userId);
-        return itemService.update(itemDtoForUpdate);
+    public ItemDtoForOtherUsers update(@PathVariable(value = "id") Long itemId, @RequestBody ItemDtoForOtherUsers itemDtoForOtherUsersForUpdate,
+                                       @RequestHeader("X-Sharer-User-Id") Long userId) {
+        itemDtoForOtherUsersForUpdate.setId(itemId);
+        itemDtoForOtherUsersForUpdate.setOwner(userId);
+        return itemService.update(itemDtoForOtherUsersForUpdate);
     }
 
     @GetMapping("/{id}")
-    public ItemDto getById(@PathVariable("id") Long itemId) {
-        return itemService.getById(itemId);
+    public Dto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                       @PathVariable("id") Long itemId) {
+        Dto result = itemService.getById(userId, itemId);
+        System.out.println(result);
+        return result;
     }
 
     @GetMapping
-    public List<ItemDto> findAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.findAllByOwner(userId);
+    public List<ItemDtoForOwner> findAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.getAllByOwner(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@PathParam("text") String text) {
+    public List<ItemDtoForOtherUsers> search(@PathParam("text") String text) {
         return itemService.search(text);
     }
 }

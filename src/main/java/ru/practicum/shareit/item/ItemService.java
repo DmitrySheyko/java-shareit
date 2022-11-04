@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
+import ru.practicum.shareit.interfaces.Dto;
 import ru.practicum.shareit.interfaces.Mappers;
 import ru.practicum.shareit.interfaces.Services;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
+import ru.practicum.shareit.item.dto.ItemDtoForOwner;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 
@@ -20,105 +23,125 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ItemService implements Services<ItemDto> {
+public class ItemService {
     private final ItemRepository itemRepository;
-    private final Mappers<ItemDto, Item> itemMapper;
+    private final ItemMapper itemMapper;
     private final UserService userService;
 
-    @Override
-    public ItemDto add(ItemDto itemDto) {
-        if (!userService.checkIsObjectInStorage(itemDto.getOwner())) {
-            log.warn(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
-            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDto.getOwner()));
+    public ItemDtoForOtherUsers add(ItemDtoForOtherUsers itemDtoForOtherUsers) {
+        if (!userService.checkIsObjectInStorage(itemDtoForOtherUsers.getOwner())) {
+            log.warn(String.format("Пользователь userId=%s не найден", itemDtoForOtherUsers.getOwner()));
+            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", itemDtoForOtherUsers.getOwner()));
         }
-        Item newItem = itemMapper.toEntity(itemDto);
+        Item newItem = itemMapper.DtoForOtherUsersToEntity(itemDtoForOtherUsers);
         Item addedItem = itemRepository.save(newItem);
-        ItemDto addedItemDto = itemMapper.toDto(addedItem);
-        log.info(String.format("Объект id=%s успешно добавлен", addedItemDto.getId()));
-        return addedItemDto;
+        ItemDtoForOtherUsers addedItemDtoForOtherUsers = itemMapper.toDtoForOtherUsers(addedItem);
+        log.info(String.format("Объект id=%s успешно добавлен", addedItemDtoForOtherUsers.getId()));
+        return addedItemDtoForOtherUsers;
     }
 
-    @Override
-    public ItemDto update(ItemDto itemDtoForUpdate) {
-        if (!userService.checkIsObjectInStorage(itemDtoForUpdate.getOwner())) {
-            log.warn(String.format("Пользователь userId=%s не найден", itemDtoForUpdate.getOwner()));
+    public ItemDtoForOtherUsers update(ItemDtoForOtherUsers itemDtoForOtherUsersForUpdate) {
+        if (!userService.checkIsObjectInStorage(itemDtoForOtherUsersForUpdate.getOwner())) {
+            log.warn(String.format("Пользователь userId=%s не найден", itemDtoForOtherUsersForUpdate.getOwner()));
             throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден",
-                    itemDtoForUpdate.getOwner()));
+                    itemDtoForOtherUsersForUpdate.getOwner()));
         }
-        if (!checkIsObjectInStorage(itemDtoForUpdate.getId())) {
-            log.warn(String.format("Объект itemId=%s не найден", itemDtoForUpdate.getId()));
-            throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemDtoForUpdate.getId()));
+        if (!checkIsObjectInStorage(itemDtoForOtherUsersForUpdate.getId())) {
+            log.warn(String.format("Объект itemId=%s не найден", itemDtoForOtherUsersForUpdate.getId()));
+            throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemDtoForOtherUsersForUpdate.getId()));
         }
         Item itemFromStorage;
-        Optional<Item> optionalItemFromStorage = itemRepository.findById(itemDtoForUpdate.getId());
+        Optional<Item> optionalItemFromStorage = itemRepository.findById(itemDtoForOtherUsersForUpdate.getId());
         if (optionalItemFromStorage.isEmpty()) {
-            log.warn(String.format("Информация об объекту itemId=%s не найдена", itemDtoForUpdate.getId()));
+            log.warn(String.format("Информация об объекту itemId=%s не найдена", itemDtoForOtherUsersForUpdate.getId()));
             throw new ObjectNotFoundException(String.format("Информация об объекту itemId=%s не найдена",
-                    itemDtoForUpdate.getId()));
+                    itemDtoForOtherUsersForUpdate.getId()));
         } else {
             itemFromStorage = optionalItemFromStorage.get();
         }
-        if (!Objects.equals(itemFromStorage.getOwner(), itemDtoForUpdate.getOwner())) {
+        if (!Objects.equals(itemFromStorage.getOwner(), itemDtoForOtherUsersForUpdate.getOwner())) {
             log.warn(String.format("У пользователя userId=%s нет объекта itemId=%s",
-                    itemDtoForUpdate.getOwner(), itemDtoForUpdate.getId()));
+                    itemDtoForOtherUsersForUpdate.getOwner(), itemDtoForOtherUsersForUpdate.getId()));
             throw new ObjectNotFoundException(String.format("У пользователя userId=%s нет объекта itemId=%s",
-                    itemDtoForUpdate.getOwner(), itemDtoForUpdate.getId()));
+                    itemDtoForOtherUsersForUpdate.getOwner(), itemDtoForOtherUsersForUpdate.getId()));
         }
-        itemDtoForUpdate.setId(Optional.ofNullable(itemDtoForUpdate.getId()).orElse(itemFromStorage.getId()));
-        itemDtoForUpdate.setName(Optional.ofNullable(itemDtoForUpdate.getName()).orElse(itemFromStorage.getName()));
-        itemDtoForUpdate.setDescription(Optional.ofNullable(itemDtoForUpdate.getDescription())
+        itemDtoForOtherUsersForUpdate.setId(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getId()).orElse(itemFromStorage.getId()));
+        itemDtoForOtherUsersForUpdate.setName(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getName()).orElse(itemFromStorage.getName()));
+        itemDtoForOtherUsersForUpdate.setDescription(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getDescription())
                 .orElse(itemFromStorage.getDescription()));
-        itemDtoForUpdate.setAvailable(Optional.ofNullable(itemDtoForUpdate.getAvailable())
+        itemDtoForOtherUsersForUpdate.setAvailable(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getAvailable())
                 .orElse(itemFromStorage.getAvailable()));
-        itemRepository.save(itemMapper.toEntity(itemDtoForUpdate));
-        return itemDtoForUpdate;
+        itemRepository.save(itemMapper.DtoForOtherUsersToEntity(itemDtoForOtherUsersForUpdate));
+        return itemDtoForOtherUsersForUpdate;
     }
 
-    @Override
-    public ItemDto getById(Long itemId) {
+
+    public Dto getById(Long userId, Long itemId) {
+        if (!userService.checkIsObjectInStorage(userId)) {
+            log.warn(String.format("Пользователь userId=%s не найден", userId));
+            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", userId));
+        }
         if (!checkIsObjectInStorage(itemId)) {
             log.warn(String.format("Объект itemId=%s не найден", itemId));
             throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemId));
         }
-        Item item;
+        Item item = findById(itemId);
+        if (userId.equals(item.getOwner())) {
+            ItemDtoForOwner itemDtoForOwner = itemMapper.toDtoForOwner(item);
+            log.info(String.format("Объект itemId=%s успешно получен.", itemId));
+            return itemDtoForOwner;
+        }
+        ItemDtoForOtherUsers itemDtoForOtherUsers = itemMapper.toDtoForOtherUsers(item);
+        log.info(String.format("Объект itemId=%s успешно получен.", itemId));
+        return itemDtoForOtherUsers;
+    }
+
+    public Item findById(Long itemId) {
         Optional<Item> optionalItem = itemRepository.findById(itemId);
         if (optionalItem.isEmpty()) {
             log.warn(String.format("Информция об объекте itemId=%s не найдена", itemId));
             throw new ObjectNotFoundException(String.format("Информция об объекте itemId=%s не найдена", itemId));
         } else {
-            item = optionalItem.get();
+            return optionalItem.get();
         }
-        ItemDto itemDto = itemMapper.toDto(item);
-        log.info(String.format("Объект itemId=%s успешно получен.", itemId));
-        return itemDto;
     }
 
-    @Override
-    public List<ItemDto> getAll() {
-        List<Item> listOfItems = itemRepository.findAll();
-        List<ItemDto> listOfItemDto = listOfItems.stream().map(itemMapper::toDto).collect(Collectors.toList());
-        log.info("Список объектов успешно получен.");
-        return listOfItemDto;
-    }
 
-    public List<ItemDto> findAllByOwner(Long userId) {
+
+
+    public List<ItemDtoForOwner> getAllByOwner(Long userId) {
+        if (!userService.checkIsObjectInStorage(userId)) {
+            log.warn(String.format("Пользователь userId=%s не найден", userId));
+            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", userId));
+        }
         List<Item> listOfItems = itemRepository.findAllByOwner(userId);
-        List<ItemDto> listOfItemDto = listOfItems.stream().map(itemMapper::toDto).collect(Collectors.toList());
-        log.info("Список объектов успешно получен.");
-        return listOfItemDto;
+        if(listOfItems != null) {
+            List<ItemDtoForOwner> listOfItemDtoForOwners = listOfItems.stream().map(itemMapper::toDtoForOwner).collect(Collectors.toList());
+            log.info("Список объектов успешно получен.");
+            return listOfItemDtoForOwners;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
-    public List<ItemDto> search(String text) {
+//    public List<ItemDtoForOtherUsers> getAll() {
+//        List<Item> listOfItems = itemRepository.findAll();
+//        List<ItemDtoForOtherUsers> listOfItemDtoForOtherUsers = listOfItems.stream().map(itemMapper::toDtoForOtherUsers).collect(Collectors.toList());
+//        log.info("Список объектов успешно получен.");
+//        return listOfItemDtoForOtherUsers;
+//    }
+
+
+    public List<ItemDtoForOtherUsers> search(String text) {
         if (StringUtils.isBlank(text)) {
             return Collections.emptyList();
         }
         List<Item> listOfItems = itemRepository.search(text);
-        List<ItemDto> listOfItemDto = listOfItems.stream().map(itemMapper::toDto).collect(Collectors.toList());
+        List<ItemDtoForOtherUsers> listOfItemDtoForOtherUsers = listOfItems.stream().map(itemMapper::toDtoForOtherUsers).collect(Collectors.toList());
         log.info("Список объектов успешно получен.");
-        return listOfItemDto;
+        return listOfItemDtoForOtherUsers;
     }
 
-    @Override
     public String delete(Long userId) {
         itemRepository.deleteById(userId);
         log.info(String.format("Пользователь id=%s успешно удален.", userId));

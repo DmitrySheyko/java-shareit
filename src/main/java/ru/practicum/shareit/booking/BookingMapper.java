@@ -2,8 +2,11 @@ package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.user.UserService;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,33 +18,49 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 public class BookingMapper {
     private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private final UserService userService;
+    private final ItemService itemService;
 
-    public BookingDto toDto(Booking booking) {
+    public BookingResponseDto EntityToResponseDto(Booking booking) {
         if (booking == null) {
             return null;
         } else {
-            BookingDto bookingDto = new BookingDto();
-            bookingDto.setId(booking.getId());
-            bookingDto.setBooker(booking.getBooker());
-            bookingDto.setItemId(booking.getItemId());
-            bookingDto.setStart(instantToString(booking.getStart()));
-            bookingDto.setEnd(instantToString(booking.getEnd()));
-            bookingDto.setStatus(booking.getStatus());
-            return bookingDto;
+            BookingResponseDto bookingResponseDto = new BookingResponseDto();
+            bookingResponseDto.setId(booking.getId());
+            bookingResponseDto.setBooker (userService.getById(booking.getBookerId()));
+            bookingResponseDto.setItem(itemService.findById(booking.getItemId()));
+            bookingResponseDto.setStart(instantToString(booking.getStart()));
+            bookingResponseDto.setEnd(instantToString(booking.getEnd()));
+            bookingResponseDto.setStatus(booking.getStatus());
+            return bookingResponseDto;
         }
     }
 
-    public Booking toBooking(BookingDto bookingDto) {
-        if (bookingDto == null) {
+    public Booking responseDtoToEntity(BookingResponseDto bookingResponseDto) {
+        if (bookingResponseDto == null) {
             return null;
         } else {
             Booking booking = new Booking();
-            booking.setId(bookingDto.getId());
-            booking.setBooker(bookingDto.getBooker());
-            booking.setItemId(bookingDto.getItemId());
-            booking.setStart(stringToInstant(bookingDto.getStart()));
-            booking.setEnd(stringToInstant(bookingDto.getEnd()));
-            booking.setStatus(bookingDto.getStatus());
+            booking.setId(bookingResponseDto.getId());
+            booking.setStart(stringToInstant(bookingResponseDto.getStart()));
+            booking.setEnd(stringToInstant(bookingResponseDto.getEnd()));
+            booking.setItemId(bookingResponseDto.getItem().getId());
+            booking.setBookerId(bookingResponseDto.getBooker().getId());
+            booking.setStatus(bookingResponseDto.getStatus());
+            return booking;
+        }
+    }
+
+    public Booking requestDtoToEntity(BookingRequestDto bookingRequestDto) {
+        if (bookingRequestDto == null) {
+            return null;
+        } else {
+            Booking booking = new Booking();
+            booking.setBookerId(bookingRequestDto.getBookerId());
+            booking.setItemId(bookingRequestDto.getItemId());
+            booking.setStart(stringToInstant(bookingRequestDto.getStart()));
+            booking.setEnd(stringToInstant(bookingRequestDto.getEnd()));
+            booking.setStatus(bookingRequestDto.getStatus());
             return booking;
         }
     }
