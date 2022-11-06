@@ -26,7 +26,8 @@ public class UserController implements Controllers<UserDto> {
 
     @Override
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable(value = "id") Long userId, @RequestBody UserDto userDtoForUpdate) {
+    public UserDto update(@PathVariable(value = "id") Long userId,
+                          @RequestBody UserDto userDtoForUpdate) {
         userDtoForUpdate.setId(userId);
         return services.update(userDtoForUpdate);
     }

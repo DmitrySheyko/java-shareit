@@ -11,14 +11,11 @@ import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.UnsupportedStatusException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,7 +37,7 @@ public class BookingService {
             log.warn(String.format("Объект id=%s не доступен для бронирования.", bookingRequestDto.getBookerId()));
             throw new ValidationException(String.format("Объект id=%s не доступен для бронирования.", bookingRequestDto.getBookerId()));
         }
-        if (checkIsUserOwnerOfItem(bookingRequestDto.getBookerId(), bookingRequestDto.getItemId())){
+        if (checkIsUserOwnerOfItem(bookingRequestDto.getBookerId(), bookingRequestDto.getItemId())) {
             log.warn(String.format("Пользователь id=%s не может забронировать свою вещь id=%s.", bookingRequestDto.getBookerId(), bookingRequestDto.getItemId()));
             throw new ObjectNotFoundException(String.format("Пользователь id=%s не может забронировать свою вещь id=%s.", bookingRequestDto.getBookerId(), bookingRequestDto.getItemId()));
         }
@@ -61,12 +58,12 @@ public class BookingService {
             log.warn(String.format("Бронирование id=%s не найдено.", bookingId));
             throw new ValidationException(String.format("Бронирование id=%s не найдено.", bookingId));
         }
-        if(!checkIsUserOwnerOfBookedItem(userId, bookingId)){
+        if (!checkIsUserOwnerOfBookedItem(userId, bookingId)) {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
             throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
         }
         BookingResponseDto bookingResponseDto = getById(userId, bookingId);
-        if (bookingResponseDto.getStatus().equals(BookingStatus.APPROVED)){
+        if (bookingResponseDto.getStatus().equals(BookingStatus.APPROVED)) {
             log.warn(String.format("Статус бронирование id=%s не может  быть изменен.", bookingId));
             throw new ValidationException(String.format("Статус бронирование id=%s не может  быть изменен.", bookingId));
         }
@@ -91,7 +88,7 @@ public class BookingService {
             log.warn(String.format("Бронирование id=%s не найдено.", bookingId));
             throw new ObjectNotFoundException(String.format("Бронирование id=%s не найдено.", bookingId));
         }
-        if(! (checkIsUserCreatorOfBooking(userId, bookingId) || checkIsUserOwnerOfBookedItem(userId, bookingId))){
+        if (!(checkIsUserCreatorOfBooking(userId, bookingId) || checkIsUserOwnerOfBookedItem(userId, bookingId))) {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
             throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
         }

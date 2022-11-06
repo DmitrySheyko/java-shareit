@@ -8,9 +8,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Getter
 @Setter
 @Builder
@@ -40,7 +37,6 @@ public class Item {
     private Long owner;
 
     @Transient
-//    @Column(name = "request_id")
     private ItemRequest request;
 
     @Override

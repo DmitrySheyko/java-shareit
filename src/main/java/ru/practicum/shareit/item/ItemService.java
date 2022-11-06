@@ -3,10 +3,8 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -57,12 +55,14 @@ public class ItemService {
         }
         if (!checkIsObjectInStorage(itemDtoForOtherUsersForUpdate.getId())) {
             log.warn(String.format("Объект itemId=%s не найден", itemDtoForOtherUsersForUpdate.getId()));
-            throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemDtoForOtherUsersForUpdate.getId()));
+            throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден",
+                    itemDtoForOtherUsersForUpdate.getId()));
         }
         Item itemFromStorage;
         Optional<Item> optionalItemFromStorage = itemRepository.findById(itemDtoForOtherUsersForUpdate.getId());
         if (optionalItemFromStorage.isEmpty()) {
-            log.warn(String.format("Информация об объекту itemId=%s не найдена", itemDtoForOtherUsersForUpdate.getId()));
+            log.warn(String.format("Информация об объекту itemId=%s не найдена",
+                    itemDtoForOtherUsersForUpdate.getId()));
             throw new ObjectNotFoundException(String.format("Информация об объекту itemId=%s не найдена",
                     itemDtoForOtherUsersForUpdate.getId()));
         } else {
@@ -74,8 +74,10 @@ public class ItemService {
             throw new ObjectNotFoundException(String.format("У пользователя userId=%s нет объекта itemId=%s",
                     itemDtoForOtherUsersForUpdate.getOwner(), itemDtoForOtherUsersForUpdate.getId()));
         }
-        itemDtoForOtherUsersForUpdate.setId(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getId()).orElse(itemFromStorage.getId()));
-        itemDtoForOtherUsersForUpdate.setName(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getName()).orElse(itemFromStorage.getName()));
+        itemDtoForOtherUsersForUpdate.setId(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getId())
+                .orElse(itemFromStorage.getId()));
+        itemDtoForOtherUsersForUpdate.setName(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getName())
+                .orElse(itemFromStorage.getName()));
         itemDtoForOtherUsersForUpdate.setDescription(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getDescription())
                 .orElse(itemFromStorage.getDescription()));
         itemDtoForOtherUsersForUpdate.setAvailable(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getAvailable())
@@ -142,7 +144,7 @@ public class ItemService {
             log.warn(String.format("Объект itemId=%s не найден", commentRequestDto.getItem()));
             throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", commentRequestDto.getItem()));
         }
-        if(commentRequestDto.getText().isBlank()){// || commentRequestDto.getText().contains("\"text\": \"\"")){
+        if (commentRequestDto.getText().isBlank()) {// || commentRequestDto.getText().contains("\"text\": \"\"")){
             log.warn("Текс комментария не корректный");
             throw new ValidationException("Текс комментария не корректный");
         }
@@ -156,15 +158,6 @@ public class ItemService {
             throw new ValidationException(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
         }
     }
-
-
-//    public List<ItemDtoForOtherUsers> getAll() {
-//        List<Item> listOfItems = itemRepository.findAll();
-//        List<ItemDtoForOtherUsers> listOfItemDtoForOtherUsers = listOfItems.stream().map(itemMapper::toDtoForOtherUsers).collect(Collectors.toList());
-//        log.info("Список объектов успешно получен.");
-//        return listOfItemDtoForOtherUsers;
-//    }
-
 
     public List<ItemDtoForOtherUsers> search(String text) {
         if (StringUtils.isBlank(text)) {
@@ -202,5 +195,4 @@ public class ItemService {
         List<Booking> result = bookingRepository.findAllByBookerIdAndItemIdAndEndIsBefore(userId, itemId, Instant.now());
         return !result.isEmpty();
     }
-
 }

@@ -1,19 +1,11 @@
 package ru.practicum.shareit.booking.model;
 
 import lombok.*;
-import org.aspectj.lang.annotation.After;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.Future;
-import javax.validation.constraints.Min;
 import java.time.Instant;
 import java.util.Objects;
-
-/**
- * TODO Sprint add-bookings.
- */
 
 @Getter
 @Setter

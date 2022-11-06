@@ -71,7 +71,7 @@ public class UserService implements Services<UserDto> {
         }
     }
 
-    public User findById(Long userId){
+    public User findById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -103,11 +103,11 @@ public class UserService implements Services<UserDto> {
         }
     }
 
-    public boolean checkIsObjectInStorage(Long userId){
+    public boolean checkIsObjectInStorage(Long userId) {
         return userRepository.existsById(userId);
     }
 
-    public boolean checkIsObjectInStorage(User user){
+    public boolean checkIsObjectInStorage(User user) {
         return userRepository.existsById(user.getId());
     }
 }

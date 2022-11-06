@@ -11,9 +11,6 @@ import ru.practicum.shareit.item.dto.ItemDtoForOwner;
 import javax.websocket.server.PathParam;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
@@ -21,13 +18,15 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDtoForOtherUsers add(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDtoForOtherUsers itemDtoForOtherUsers) {
+    public ItemDtoForOtherUsers add(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @RequestBody ItemDtoForOtherUsers itemDtoForOtherUsers) {
         itemDtoForOtherUsers.setOwner(userId);
         return itemService.add(itemDtoForOtherUsers);
     }
 
     @PatchMapping("/{id}")
-    public ItemDtoForOtherUsers update(@PathVariable(value = "id") Long itemId, @RequestBody ItemDtoForOtherUsers itemDtoForOtherUsersForUpdate,
+    public ItemDtoForOtherUsers update(@PathVariable(value = "id") Long itemId,
+                                       @RequestBody ItemDtoForOtherUsers itemDtoForOtherUsersForUpdate,
                                        @RequestHeader("X-Sharer-User-Id") Long userId) {
         itemDtoForOtherUsersForUpdate.setId(itemId);
         itemDtoForOtherUsersForUpdate.setOwner(userId);
@@ -54,12 +53,12 @@ public class ItemController {
 
     @PostMapping("{itemId}/comment")
     public CommentResponseDto addComment(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                                        @PathVariable(value = "itemId") Long itemId,
-                                        @RequestBody String text) {
+                                         @PathVariable(value = "itemId") Long itemId,
+                                         @RequestBody String text) {
         CommentRequestDto commentRequestDto = CommentRequestDto.builder()
                 .author(userId)
                 .item(itemId)
-                .text(text.substring(15, (text.length()-3)))
+                .text(text.substring(15, (text.length() - 3)))
                 .build();
         return itemService.addComment(commentRequestDto);
     }

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -21,8 +20,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UnsupportedStatusException.class)
     public Error handlerOfUnsupportedStatusException(final UnsupportedStatusException e) {
-        Error error = new Error(e.getMessage());
-        return error;
+        return new Error(e.getMessage());
     }
 
     @ResponseBody

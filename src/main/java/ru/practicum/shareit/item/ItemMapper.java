@@ -4,14 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.interfaces.Mappers;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.Valid;
@@ -22,7 +18,6 @@ import java.util.List;
 @Validated
 @AllArgsConstructor
 public class ItemMapper {
-//    private final BookingService bookingService;
     private final BookingRepository bookingRepository;
 
     public ItemDtoForOtherUsers toDtoForOtherUsers(Item item, List<CommentResponseDto> listOfComments) {
@@ -69,18 +64,18 @@ public class ItemMapper {
                 .build();
     }
 
-    public Booking findLastBookingsByItemId(Long itemId){
+    public Booking findLastBookingsByItemId(Long itemId) {
         List<Booking> listOfBookings = bookingRepository.findLastBookingsByItemId(itemId, Instant.now());
-        if(listOfBookings.isEmpty()){
+        if (listOfBookings.isEmpty()) {
             return null;
         } else {
             return listOfBookings.get(0);
         }
     }
 
-    public Booking findNextBookingsByItemId(Long itemId){
+    public Booking findNextBookingsByItemId(Long itemId) {
         List<Booking> listOfBookings = bookingRepository.findNextBookingsByItemId(itemId, Instant.now());
-        if(listOfBookings.isEmpty()){
+        if (listOfBookings.isEmpty()) {
             return null;
         } else {
             return listOfBookings.get(0);

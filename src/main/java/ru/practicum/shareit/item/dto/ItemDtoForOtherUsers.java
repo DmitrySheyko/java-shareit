@@ -5,14 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.interfaces.Dto;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
 @AllArgsConstructor
