@@ -71,6 +71,18 @@ public class UserService implements Services<UserDto> {
         }
     }
 
+    public User findById(Long userId){
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            log.info(String.format("Получены данные пользователя id=%s.", userId));
+            return user;
+        } else {
+            log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
+            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
+        }
+    }
+
     @Override
     public List<UserDto> getAll() {
         List<User> listOfUsers = userRepository.findAll();

@@ -3,9 +3,10 @@ package ru.practicum.shareit.item.dto;
 import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.interfaces.Dto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.request.model.ItemRequest;
 
-import java.util.Objects;
+import java.util.List;
 
 @Data
 @Builder
@@ -20,4 +21,5 @@ public class ItemDtoForOwner implements Dto {
     private ItemRequest request;
     private Booking lastBooking;
     private Booking nextBooking;
+    private List<CommentResponseDto> comments;
 }

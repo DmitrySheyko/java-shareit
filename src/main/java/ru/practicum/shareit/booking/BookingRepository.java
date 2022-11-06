@@ -104,4 +104,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.start > ?2 " +
             "order by b.start asc ")
     List<Booking> findNextBookingsByItemId(Long itemId, Instant currentTime);
+
+    List<Booking> findAllByBookerIdAndItemIdAndEndIsBefore(Long bookerId, Long itemId, Instant currentTime);
 }

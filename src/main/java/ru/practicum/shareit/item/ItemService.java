@@ -3,17 +3,23 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.interfaces.Dto;
-import ru.practicum.shareit.interfaces.Mappers;
-import ru.practicum.shareit.interfaces.Services;
+import ru.practicum.shareit.item.dto.CommentRequestDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +31,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
+    private final CommentMapper commentMapper;
     private final UserService userService;
 
     public ItemDtoForOtherUsers add(ItemDtoForOtherUsers itemDtoForOtherUsers) {
@@ -35,7 +44,7 @@ public class ItemService {
         }
         Item newItem = itemMapper.DtoForOtherUsersToEntity(itemDtoForOtherUsers);
         Item addedItem = itemRepository.save(newItem);
-        ItemDtoForOtherUsers addedItemDtoForOtherUsers = itemMapper.toDtoForOtherUsers(addedItem);
+        ItemDtoForOtherUsers addedItemDtoForOtherUsers = itemMapper.toDtoForOtherUsers(addedItem, Collections.emptyList());
         log.info(String.format("Объект id=%s успешно добавлен", addedItemDtoForOtherUsers.getId()));
         return addedItemDtoForOtherUsers;
     }
@@ -71,8 +80,9 @@ public class ItemService {
                 .orElse(itemFromStorage.getDescription()));
         itemDtoForOtherUsersForUpdate.setAvailable(Optional.ofNullable(itemDtoForOtherUsersForUpdate.getAvailable())
                 .orElse(itemFromStorage.getAvailable()));
-        itemRepository.save(itemMapper.DtoForOtherUsersToEntity(itemDtoForOtherUsersForUpdate));
-        return itemDtoForOtherUsersForUpdate;
+        Item updatedItem = itemRepository.save(itemMapper.DtoForOtherUsersToEntity(itemDtoForOtherUsersForUpdate));
+        List<CommentResponseDto> listOfComments = findListOfComments(itemDtoForOtherUsersForUpdate.getId());
+        return itemMapper.toDtoForOtherUsers(updatedItem, listOfComments);
     }
 
 
@@ -86,12 +96,13 @@ public class ItemService {
             throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemId));
         }
         Item item = findById(itemId);
+        List<CommentResponseDto> listOfComments = findListOfComments(itemId);
         if (userId.equals(item.getOwner())) {
-            ItemDtoForOwner itemDtoForOwner = itemMapper.toDtoForOwner(item);
+            ItemDtoForOwner itemDtoForOwner = itemMapper.toDtoForOwner(item, listOfComments);
             log.info(String.format("Объект itemId=%s успешно получен.", itemId));
             return itemDtoForOwner;
         }
-        ItemDtoForOtherUsers itemDtoForOtherUsers = itemMapper.toDtoForOtherUsers(item);
+        ItemDtoForOtherUsers itemDtoForOtherUsers = itemMapper.toDtoForOtherUsers(item, listOfComments);
         log.info(String.format("Объект itemId=%s успешно получен.", itemId));
         return itemDtoForOtherUsers;
     }
@@ -106,23 +117,46 @@ public class ItemService {
         }
     }
 
-
-
-
     public List<ItemDtoForOwner> getAllByOwner(Long userId) {
         if (!userService.checkIsObjectInStorage(userId)) {
             log.warn(String.format("Пользователь userId=%s не найден", userId));
             throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", userId));
         }
         List<Item> listOfItems = itemRepository.findAllByOwner(userId);
-        if(listOfItems != null) {
-            List<ItemDtoForOwner> listOfItemDtoForOwners = listOfItems.stream().map(itemMapper::toDtoForOwner).collect(Collectors.toList());
+        if (listOfItems != null) {
+            List<ItemDtoForOwner> listOfItemDtoForOwners = listOfItems.stream()
+                    .map(item -> itemMapper.toDtoForOwner(item, findListOfComments(item.getId()))).collect(Collectors.toList());
             log.info("Список объектов успешно получен.");
             return listOfItemDtoForOwners;
         } else {
             return Collections.emptyList();
         }
     }
+
+    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
+        if (!userService.checkIsObjectInStorage(commentRequestDto.getAuthor())) {
+            log.warn(String.format("Пользователь userId=%s не найден", commentRequestDto.getAuthor()));
+            throw new ObjectNotFoundException(String.format("Пользователь userId=%s не найден", commentRequestDto.getAuthor()));
+        }
+        if (!checkIsObjectInStorage(commentRequestDto.getItem())) {
+            log.warn(String.format("Объект itemId=%s не найден", commentRequestDto.getItem()));
+            throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", commentRequestDto.getItem()));
+        }
+        if(commentRequestDto.getText().isBlank()){// || commentRequestDto.getText().contains("\"text\": \"\"")){
+            log.warn("Текс комментария не корректный");
+            throw new ValidationException("Текс комментария не корректный");
+        }
+        if (checkIsUserCanMakeComment(commentRequestDto.getAuthor(), commentRequestDto.getItem())) {
+            Comment comment = commentMapper.toEntity(commentRequestDto);
+            comment.setCreated(Instant.now());
+            Comment savedComment = commentRepository.save(comment);
+            return commentMapper.toCommentResponseDto(savedComment);
+        } else {
+            log.warn(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
+            throw new ValidationException(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
+        }
+    }
+
 
 //    public List<ItemDtoForOtherUsers> getAll() {
 //        List<Item> listOfItems = itemRepository.findAll();
@@ -137,7 +171,9 @@ public class ItemService {
             return Collections.emptyList();
         }
         List<Item> listOfItems = itemRepository.search(text);
-        List<ItemDtoForOtherUsers> listOfItemDtoForOtherUsers = listOfItems.stream().map(itemMapper::toDtoForOtherUsers).collect(Collectors.toList());
+        List<ItemDtoForOtherUsers> listOfItemDtoForOtherUsers = listOfItems.stream()
+                .map(item -> itemMapper.toDtoForOtherUsers(item, findListOfComments(item.getId())))
+                .collect(Collectors.toList());
         log.info("Список объектов успешно получен.");
         return listOfItemDtoForOtherUsers;
     }
@@ -155,4 +191,16 @@ public class ItemService {
     public boolean checkIsObjectInStorage(Item item) {
         return itemRepository.existsById(item.getId());
     }
+
+    public List<CommentResponseDto> findListOfComments(Long itemId) {
+        return commentRepository.findByItem(itemId).stream()
+                .map(commentMapper::toCommentResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public Boolean checkIsUserCanMakeComment(Long userId, Long itemId) {
+        List<Booking> result = bookingRepository.findAllByBookerIdAndItemIdAndEndIsBefore(userId, itemId, Instant.now());
+        return !result.isEmpty();
+    }
+
 }

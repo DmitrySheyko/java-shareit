@@ -8,8 +8,10 @@ import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.interfaces.Mappers;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.Valid;
@@ -23,7 +25,7 @@ public class ItemMapper {
 //    private final BookingService bookingService;
     private final BookingRepository bookingRepository;
 
-    public ItemDtoForOtherUsers toDtoForOtherUsers(Item item) {
+    public ItemDtoForOtherUsers toDtoForOtherUsers(Item item, List<CommentResponseDto> listOfComments) {
         return ItemDtoForOtherUsers.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -33,10 +35,11 @@ public class ItemMapper {
                 .request(item.getRequest())
                 .lastBooking(null)
                 .nextBooking(null)
+                .comments(listOfComments)
                 .build();
     }
 
-    public ItemDtoForOwner toDtoForOwner(Item item) {
+    public ItemDtoForOwner toDtoForOwner(Item item, List<CommentResponseDto> listOfComments) {
         if (item == null) {
             return null;
         } else {
@@ -49,6 +52,7 @@ public class ItemMapper {
                     .request(item.getRequest())
                     .lastBooking(findLastBookingsByItemId(item.getId()))
                     .nextBooking(findNextBookingsByItemId(item.getId()))
+                    .comments(listOfComments)
                     .build();
         }
     }
