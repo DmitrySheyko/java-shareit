@@ -1,12 +1,12 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.mapper;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -18,8 +18,8 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 public class BookingMapper {
     private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    private final UserService userService;
-    private final ItemService itemService;
+    private final UserServiceImpl userServiceImpl;
+    private final ItemServiceImpl itemServiceImpl;
 
     public BookingResponseDto EntityToResponseDto(Booking booking) {
         if (booking == null) {
@@ -27,27 +27,12 @@ public class BookingMapper {
         } else {
             BookingResponseDto bookingResponseDto = new BookingResponseDto();
             bookingResponseDto.setId(booking.getId());
-            bookingResponseDto.setBooker (userService.getById(booking.getBookerId()));
-            bookingResponseDto.setItem(itemService.findById(booking.getItemId()));
+            bookingResponseDto.setBooker (userServiceImpl.getById(booking.getBookerId()));
+            bookingResponseDto.setItem(itemServiceImpl.findById(booking.getItemId()));
             bookingResponseDto.setStart(instantToString(booking.getStart()));
             bookingResponseDto.setEnd(instantToString(booking.getEnd()));
             bookingResponseDto.setStatus(booking.getStatus());
             return bookingResponseDto;
-        }
-    }
-
-    public Booking responseDtoToEntity(BookingResponseDto bookingResponseDto) {
-        if (bookingResponseDto == null) {
-            return null;
-        } else {
-            Booking booking = new Booking();
-            booking.setId(bookingResponseDto.getId());
-            booking.setStart(stringToInstant(bookingResponseDto.getStart()));
-            booking.setEnd(stringToInstant(bookingResponseDto.getEnd()));
-            booking.setItemId(bookingResponseDto.getItem().getId());
-            booking.setBookerId(bookingResponseDto.getBooker().getId());
-            booking.setStatus(bookingResponseDto.getStatus());
-            return booking;
         }
     }
 

@@ -1,13 +1,14 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.mapper;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
-import ru.practicum.shareit.item.dto.ItemDtoForOtherUsers;
-import ru.practicum.shareit.item.dto.ItemDtoForOwner;
+import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemResponseResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseResponseDtoForOwner;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.Valid;
@@ -20,13 +21,13 @@ import java.util.List;
 public class ItemMapper {
     private final BookingRepository bookingRepository;
 
-    public ItemDtoForOtherUsers toDtoForOtherUsers(Item item, List<CommentResponseDto> listOfComments) {
-        return ItemDtoForOtherUsers.builder()
+    public ItemResponseResponseDto toDtoForOtherUsers(Item item, List<CommentResponseDto> listOfComments) {
+        return ItemResponseResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .owner(item.getOwner())
+//                .owner(item.getOwner())
                 .request(item.getRequest())
                 .lastBooking(null)
                 .nextBooking(null)
@@ -34,16 +35,15 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemDtoForOwner toDtoForOwner(Item item, List<CommentResponseDto> listOfComments) {
+    public ItemResponseResponseDtoForOwner toDtoForOwner(Item item, List<CommentResponseDto> listOfComments) {
         if (item == null) {
             return null;
         } else {
-            return ItemDtoForOwner.builder()
+            return ItemResponseResponseDtoForOwner.builder()
                     .id(item.getId())
                     .name(item.getName())
                     .description(item.getDescription())
                     .available(item.getAvailable())
-                    .owner(item.getOwner())
                     .request(item.getRequest())
                     .lastBooking(findLastBookingsByItemId(item.getId()))
                     .nextBooking(findNextBookingsByItemId(item.getId()))
@@ -52,15 +52,13 @@ public class ItemMapper {
         }
     }
 
-    @Valid
-    public Item DtoForOtherUsersToEntity(ItemDtoForOtherUsers itemDtoForOtherUsers) {
+    public Item RequestDtoToEntity(ItemRequestDto itemRequestDto) {
         return Item.builder()
-                .id(itemDtoForOtherUsers.getId())
-                .name(itemDtoForOtherUsers.getName())
-                .description(itemDtoForOtherUsers.getDescription())
-                .available(itemDtoForOtherUsers.getAvailable())
-                .owner(itemDtoForOtherUsers.getOwner())
-                .request(itemDtoForOtherUsers.getRequest())
+                .id(itemRequestDto.getId())
+                .name(itemRequestDto.getName())
+                .description(itemRequestDto.getDescription())
+                .owner(itemRequestDto.getOwner())
+                .available(itemRequestDto.getAvailable())
                 .build();
     }
 

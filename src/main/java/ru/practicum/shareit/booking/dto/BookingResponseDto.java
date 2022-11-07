@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,15 +19,5 @@ public class BookingResponseDto {
     private UserDto booker;
     private BookingStatus status;
 
-    @Override
-    public String toString() {
-        return "BookingResponseDto{" +
-                "id=" + id +
-                ", start='" + start + '\'' +
-                ", end='" + end + '\'' +
-                ", item=" + item +
-                ", booker=" + booker +
-                ", status=" + status +
-                '}';
-    }
+
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.repositiory;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
@@ -105,4 +106,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findNextBookingsByItemId(Long itemId, Instant currentTime);
 
     List<Booking> findAllByBookerIdAndItemIdAndEndIsBefore(Long bookerId, Long itemId, Instant currentTime);
+
+    @Query(" select b " +
+            "from Booking b " +
+            "where b.itemId = ?1 and " +
+            "b.end > ?2 and " +
+            "b.start < ?3 "
+    )
+    Optional<Booking> findCurrentAndApprovedBookingForItem(Long itemId, Instant start, Instant end);
+
 }

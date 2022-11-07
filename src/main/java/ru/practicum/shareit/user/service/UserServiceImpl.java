@@ -1,13 +1,13 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
-import ru.practicum.shareit.interfaces.Mappers;
-import ru.practicum.shareit.interfaces.Services;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class UserService implements Services<UserDto> {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final Mappers<UserDto, User> userMapper;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto add(UserDto userDto) {
@@ -30,10 +30,7 @@ public class UserService implements Services<UserDto> {
 
     @Override
     public UserDto update(UserDto userDtoForUpdate) {
-        if (!userRepository.existsById(userDtoForUpdate.getId())) {
-            log.warn(String.format("Пользователь id=%s не найден.", userDtoForUpdate.getId()));
-            throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userDtoForUpdate.getId()));
-        }
+        checkIsUserInStorage(userDtoForUpdate.getId());
         User userFromStorage;
         Optional<User> optionalUserFromStorage = userRepository.findById(userDtoForUpdate.getId());
         if (optionalUserFromStorage.isPresent()) {
@@ -71,18 +68,6 @@ public class UserService implements Services<UserDto> {
         }
     }
 
-    public User findById(Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            log.info(String.format("Получены данные пользователя id=%s.", userId));
-            return user;
-        } else {
-            log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
-            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
-        }
-    }
-
     @Override
     public List<UserDto> getAll() {
         List<User> listOfUsers = userRepository.findAll();
@@ -97,17 +82,28 @@ public class UserService implements Services<UserDto> {
             log.info(String.format("Пользователь id=%s успешно удален", userId));
             return String.format("Пользователь id=%s успешно удален", userId);
         } else {
-            System.out.println("Тема работает");
             log.warn(String.format("Пользователь id=%s не найден.", userId));
             throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
         }
     }
 
-    public boolean checkIsObjectInStorage(Long userId) {
-        return userRepository.existsById(userId);
+    @Override
+    public void checkIsUserInStorage(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            log.warn(String.format("Пользователь id=%s не найден.", userId));
+            throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
+        }
     }
 
-    public boolean checkIsObjectInStorage(User user) {
-        return userRepository.existsById(user.getId());
+    public User findById(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            log.info(String.format("Получены данные пользователя id=%s.", userId));
+            return user;
+        } else {
+            log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
+            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
+        }
     }
 }

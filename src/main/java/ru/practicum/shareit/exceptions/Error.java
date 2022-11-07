@@ -1,7 +1,5 @@
 package ru.practicum.shareit.exceptions;
 
-import java.util.Map;
-
 public class Error {
     String error;
 

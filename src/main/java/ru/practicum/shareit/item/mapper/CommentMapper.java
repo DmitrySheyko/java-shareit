@@ -1,11 +1,11 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.mapper;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 public class CommentMapper {
     private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     public CommentResponseDto toCommentResponseDto(Comment comment) {
         if (comment == null) {
@@ -24,7 +24,7 @@ public class CommentMapper {
         } else {
             return CommentResponseDto.builder()
                     .id(comment.getId())
-                    .authorName(userService.findById(comment.getAuthor()).getName())
+                    .authorName(userServiceImpl.findById(comment.getAuthor()).getName())
                     .text(comment.getText())
                     .created(instantToString(comment.getCreated()))
                     .build();

@@ -9,6 +9,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -47,22 +48,5 @@ public class Booking {
                 && Objects.equals(itemId, booking.itemId)
                 && Objects.equals(bookerId, booking.bookerId)
                 && status == booking.status;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, start, end, itemId, bookerId, status);
-    }
-
-    @Override
-    public String toString() {
-        return "Booking{" +
-                "id=" + id +
-                ", start=" + start +
-                ", end=" + end +
-                ", itemId=" + itemId +
-                ", bookerId=" + bookerId +
-                ", status=" + status +
-                '}';
     }
 }

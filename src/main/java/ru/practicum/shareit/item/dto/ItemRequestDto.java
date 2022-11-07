@@ -10,12 +10,12 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentRequestDto {
+public class ItemRequestDto {
     private Long id;
-    @NotBlank(message = "Текст комментария не должен быть пустым")
-    private String text;
-    @NotBlank(message = "В запросе не предостален id объекта")
-    private Long item;
+    private String name;
+    private String description;
     @NotBlank(message = "В запросе не предостален id пользователя")
-    private Long author;
+    private Long owner;
+    private Boolean available;
 }
+

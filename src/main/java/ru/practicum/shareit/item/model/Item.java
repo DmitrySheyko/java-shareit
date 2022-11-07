@@ -10,9 +10,10 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@Builder
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "items")
 public class Item {
@@ -32,23 +33,9 @@ public class Item {
     @NotNull(message = "Должно быть указано доступен ли объект: true/false")
     private Boolean available;
 
-    @Column(name = "owner_id")
     @NotNull(message = "Должен быть указан UserId владельца")
     private Long owner;
 
     @Transient
     private ItemRequest request;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return Objects.equals(id, item.id) && Objects.equals(name, item.name) && Objects.equals(description, item.description) && Objects.equals(available, item.available) && Objects.equals(owner, item.owner) && Objects.equals(request, item.request);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, available, owner, request);
-    }
 }
