@@ -53,7 +53,7 @@ public class ItemController {
         CommentRequestDto commentRequestDto = CommentRequestDto.builder()
                 .author(userId)
                 .item(itemId)
-                .text(text)
+                .text(text.substring(15, (text.length() - 3)))
                 .build();
         return itemServiceImpl.addComment(commentRequestDto);
     }
