@@ -5,14 +5,12 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Future;
 import java.time.Instant;
-import java.util.Objects;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-
+@Builder
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -41,11 +39,25 @@ public class Booking {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Booking booking = (Booking) o;
-        return Objects.equals(id, booking.id) && Objects.equals(start, booking.start)
-                && Objects.equals(end, booking.end)
-                && Objects.equals(itemId, booking.itemId)
-                && Objects.equals(bookerId, booking.bookerId)
-                && status == booking.status;
+
+        if (!id.equals(booking.id)) return false;
+        if (!start.equals(booking.start)) return false;
+        if (!end.equals(booking.end)) return false;
+        if (!itemId.equals(booking.itemId)) return false;
+        if (!bookerId.equals(booking.bookerId)) return false;
+        return status == booking.status;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + start.hashCode();
+        result = 31 * result + end.hashCode();
+        result = 31 * result + itemId.hashCode();
+        result = 31 * result + bookerId.hashCode();
+        result = 31 * result + status.hashCode();
+        return result;
     }
 }

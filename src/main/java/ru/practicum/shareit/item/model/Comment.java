@@ -1,11 +1,9 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -34,14 +32,25 @@ public class Comment {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+
         Comment comment = (Comment) o;
-        return id != null && Objects.equals(id, comment.id);
+
+        if (!id.equals(comment.id)) return false;
+        if (!text.equals(comment.text)) return false;
+        if (!item.equals(comment.item)) return false;
+        if (!author.equals(comment.author)) return false;
+        return created.equals(comment.created);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        int result = id.hashCode();
+        result = 31 * result + text.hashCode();
+        result = 31 * result + item.hashCode();
+        result = 31 * result + author.hashCode();
+        result = 31 * result + created.hashCode();
+        return result;
     }
 }
 

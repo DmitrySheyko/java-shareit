@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.persistence.*;
@@ -11,9 +10,9 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "items")
 public class Item {
@@ -33,6 +32,7 @@ public class Item {
     @NotNull(message = "Должно быть указано доступен ли объект: true/false")
     private Boolean available;
 
+    @Column(name = "owner_id")
     @NotNull(message = "Должен быть указан UserId владельца")
     private Long owner;
 
@@ -42,13 +42,26 @@ public class Item {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+
         Item item = (Item) o;
-        return id != null && Objects.equals(id, item.id);
+
+        if (!id.equals(item.id)) return false;
+        if (!name.equals(item.name)) return false;
+        if (!description.equals(item.description)) return false;
+        if (!available.equals(item.available)) return false;
+        if (!owner.equals(item.owner)) return false;
+        return Objects.equals(request, item.request);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + description.hashCode();
+        result = 31 * result + available.hashCode();
+        result = 31 * result + owner.hashCode();
+        result = 31 * result + (request != null ? request.hashCode() : 0);
+        return result;
     }
 }

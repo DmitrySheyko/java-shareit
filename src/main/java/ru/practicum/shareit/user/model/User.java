@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -31,13 +30,20 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+
         User user = (User) o;
-        return id != null && Objects.equals(id, user.id);
+
+        if (!id.equals(user.id)) return false;
+        if (!Objects.equals(name, user.name)) return false;
+        return email.equals(user.email);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        int result = id.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + email.hashCode();
+        return result;
     }
 }
