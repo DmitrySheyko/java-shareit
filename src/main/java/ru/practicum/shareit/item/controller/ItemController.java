@@ -33,8 +33,7 @@ public class ItemController {
     @GetMapping("/{id}")
     public ResponseDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                @PathVariable("id") Long itemId) {
-        ResponseDto result = itemServiceImpl.getById(userId, itemId);
-        return result;
+        return itemServiceImpl.getById(userId, itemId);
     }
 
     @GetMapping
@@ -54,7 +53,7 @@ public class ItemController {
         CommentRequestDto commentRequestDto = CommentRequestDto.builder()
                 .author(userId)
                 .item(itemId)
-                .text(text.substring(15, (text.length() - 3)))
+                .text(text)
                 .build();
         return itemServiceImpl.addComment(commentRequestDto);
     }
