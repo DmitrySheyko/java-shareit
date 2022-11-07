@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 @AllArgsConstructor
 public class CommentMapper {
-    private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final UserServiceImpl userServiceImpl;
 
     public CommentResponseDto toCommentResponseDto(Comment comment) {
