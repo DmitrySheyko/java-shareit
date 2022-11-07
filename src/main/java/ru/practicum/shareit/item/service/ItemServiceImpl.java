@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
@@ -38,7 +38,7 @@ public class ItemServiceImpl implements ItemService{
     @Override
     public ItemResponseResponseDto add(ItemRequestDto itemRequestDto) {
         userServiceImpl.checkIsUserInStorage(itemRequestDto.getOwner());
-        Item newItem = itemMapper.RequestDtoToEntity(itemRequestDto);
+        Item newItem = itemMapper.requestDtoToEntity(itemRequestDto);
         Item addedItem = itemRepository.save(newItem);
         ItemResponseResponseDto addedItemResponseDto = itemMapper.toDtoForOtherUsers(addedItem,
                 Collections.emptyList());
@@ -72,7 +72,7 @@ public class ItemServiceImpl implements ItemService{
                 .orElse(itemFromStorage.getDescription()));
         itemRequestDto.setAvailable(Optional.ofNullable(itemRequestDto.getAvailable())
                 .orElse(itemFromStorage.getAvailable()));
-        Item updatedItem = itemRepository.save(itemMapper.RequestDtoToEntity(itemRequestDto));
+        Item updatedItem = itemRepository.save(itemMapper.requestDtoToEntity(itemRequestDto));
         List<CommentResponseDto> listOfComments = findListOfComments(itemRequestDto.getId());
         return itemMapper.toDtoForOtherUsers(updatedItem, listOfComments);
     }

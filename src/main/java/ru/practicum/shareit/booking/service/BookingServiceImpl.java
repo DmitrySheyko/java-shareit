@@ -29,12 +29,12 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
     private final UserServiceImpl userServiceImpl;
     private final ItemServiceImpl itemServiceImpl;
-    private final static String ALL_REQUEST = "ALL";
-    private final static String CURRENT_REQUEST = "CURRENT";
-    private final static String PAST_REQUEST = "PAST";
-    private final static String FUTURE_REQUEST = "FUTURE";
-    private final static String WAITING_REQUEST = "WAITING";
-    private final static String REJECTED_REQUEST = "REJECTED";
+    private static final String ALL_REQUEST = "ALL";
+    private static final String CURRENT_REQUEST = "CURRENT";
+    private static final String PAST_REQUEST = "PAST";
+    private static final String FUTURE_REQUEST = "FUTURE";
+    private static final String WAITING_REQUEST = "WAITING";
+    private static final String REJECTED_REQUEST = "REJECTED";
 
     @Override
     public BookingResponseDto add(BookingRequestDto bookingRequestDto) {
@@ -53,7 +53,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.WAITING);
         Booking savedBooking = bookingRepository.save(booking);
         log.info(String.format("Бронирование id=%s успешно добавлено.", savedBooking.getId()));
-        return bookingMapper.EntityToResponseDto(savedBooking);
+        return bookingMapper.entityToResponseDto(savedBooking);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
             bookingForUpdate.setStatus(isApproved ? BookingStatus.WAITING : BookingStatus.CANCELED);
         }
         Booking updatedBooking = bookingRepository.save(bookingForUpdate);
-        BookingResponseDto bookingResponseDto = bookingMapper.EntityToResponseDto(updatedBooking);
+        BookingResponseDto bookingResponseDto = bookingMapper.entityToResponseDto(updatedBooking);
         log.info(String.format("Бронирование id=%s успешно обновлено.", bookingId));
         return bookingResponseDto;
     }
@@ -85,11 +85,11 @@ public class BookingServiceImpl implements BookingService {
         checkIsBookingInStorage(bookingId);
         if (!(checkIsUserCreatorOfBooking(userId, bookingId) || checkIsUserOwnerOfBookedItem(userId, bookingId))) {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
-            throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  для пользователя id=%s."
-                    , userId));
+            throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  для " +
+                    "пользователя id=%s.", userId));
         }
         Booking booking = findById(bookingId);
-        BookingResponseDto bookingResponseDto = bookingMapper.EntityToResponseDto(booking);
+        BookingResponseDto bookingResponseDto = bookingMapper.entityToResponseDto(booking);
         log.info(String.format("Бронирование id=%s успешно получено.", bookingId));
         return bookingResponseDto;
     }
@@ -128,7 +128,7 @@ public class BookingServiceImpl implements BookingService {
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             }
         }
-        return result.stream().map(bookingMapper::EntityToResponseDto).collect(Collectors.toList());
+        return result.stream().map(bookingMapper::entityToResponseDto).collect(Collectors.toList());
     }
 
     @Override
@@ -165,7 +165,7 @@ public class BookingServiceImpl implements BookingService {
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             }
         }
-        return result.stream().map(bookingMapper::EntityToResponseDto).collect(Collectors.toList());
+        return result.stream().map(bookingMapper::entityToResponseDto).collect(Collectors.toList());
     }
 
     private Booking findById(Long bookingId) {

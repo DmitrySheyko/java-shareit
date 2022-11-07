@@ -20,7 +20,7 @@ public class UserMapper {
     }
 
     @Valid
-    public User DtoForOtherUsersToEntity(UserDto userDto) {
+    public User dtoForOtherUsersToEntity(UserDto userDto) {
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())

@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.dto.ItemResponseResponseDto;
 import ru.practicum.shareit.item.dto.ItemResponseResponseDtoForOwner;
 import ru.practicum.shareit.item.model.Item;
 
-import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
@@ -27,7 +26,6 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-//                .owner(item.getOwner())
                 .request(item.getRequest())
                 .lastBooking(null)
                 .nextBooking(null)
@@ -52,7 +50,7 @@ public class ItemMapper {
         }
     }
 
-    public Item RequestDtoToEntity(ItemRequestDto itemRequestDto) {
+    public Item requestDtoToEntity(ItemRequestDto itemRequestDto) {
         return Item.builder()
                 .id(itemRequestDto.getId())
                 .name(itemRequestDto.getName())

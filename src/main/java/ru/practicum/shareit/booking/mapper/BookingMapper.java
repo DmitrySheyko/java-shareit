@@ -17,17 +17,17 @@ import java.time.format.DateTimeFormatter;
 @Component
 @AllArgsConstructor
 public class BookingMapper {
-    private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final UserServiceImpl userServiceImpl;
     private final ItemServiceImpl itemServiceImpl;
 
-    public BookingResponseDto EntityToResponseDto(Booking booking) {
+    public BookingResponseDto entityToResponseDto(Booking booking) {
         if (booking == null) {
             return null;
         } else {
             BookingResponseDto bookingResponseDto = new BookingResponseDto();
             bookingResponseDto.setId(booking.getId());
-            bookingResponseDto.setBooker (userServiceImpl.getById(booking.getBookerId()));
+            bookingResponseDto.setBooker(userServiceImpl.getById(booking.getBookerId()));
             bookingResponseDto.setItem(itemServiceImpl.findById(booking.getItemId()));
             bookingResponseDto.setStart(instantToString(booking.getStart()));
             bookingResponseDto.setEnd(instantToString(booking.getEnd()));

@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = userMapper.DtoForOtherUsersToEntity(userDto);
+        User user = userMapper.dtoForOtherUsersToEntity(userDto);
         User createdUser = userRepository.save(user);
         log.info(String.format("Пользователь id=%s успешно добавлен.", createdUser.getId()));
         return userMapper.toDtoForOtherUsers(createdUser);
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
             userDtoForUpdate.setEmail(userFromStorage.getEmail());
         }
         userDtoForUpdate.setName(Optional.ofNullable(userDtoForUpdate.getName()).orElse(userFromStorage.getName()));
-        User userForUpdate = userMapper.DtoForOtherUsersToEntity(userDtoForUpdate);
+        User userForUpdate = userMapper.dtoForOtherUsersToEntity(userDtoForUpdate);
         User updatedUser = userRepository.save(userForUpdate);
         log.info(String.format("Пользователь id=%s успешно обновлен.", userDtoForUpdate.getId()));
         return userMapper.toDtoForOtherUsers(updatedUser);
