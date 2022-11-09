@@ -98,8 +98,8 @@ public class BookingServiceImpl implements BookingService {
                 break;
             }
             case CURRENT: {
-                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId
-                        , Instant.now(), Instant.now());
+                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
+                        Instant.now(), Instant.now());
                 break;
             }
             case FUTURE: {
@@ -175,8 +175,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkIsItemCanBeBooked(Long itemId, Instant start, Instant end) {
-        Optional<Booking> optionalBooking = bookingRepository.
-                findByItemIdAndEndAfterAndStartBeforeOrderByStartDesc(itemId, start, end);
+        Optional<Booking> optionalBooking = bookingRepository
+                .findByItemIdAndEndAfterAndStartBeforeOrderByStartDesc(itemId, start, end);
         if (!optionalBooking.isEmpty()) {
             log.warn(String.format("Объект id=%s не доступен для бронирования.", itemId));
             throw new ValidationException(String.format("Объект id=%s не доступен для бронирования.", itemId));
