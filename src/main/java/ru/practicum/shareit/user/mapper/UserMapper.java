@@ -12,6 +12,9 @@ import javax.validation.Valid;
 public class UserMapper {
 
     public UserDto toDtoForOtherUsers(User user) {
+        if (user == null) {
+            return null;
+        }
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -21,6 +24,9 @@ public class UserMapper {
 
     @Valid
     public User dtoForOtherUsersToEntity(UserDto userDto) {
+        if (userDto == null) {
+            return null;
+        }
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())

@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(path = "/users")
 public class UserController {
-    UserServiceImpl userService;
+    UserService userService;
 
     @PostMapping
     public UserDto add(@RequestBody @Valid UserDto userDto) {

@@ -13,39 +13,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
-    @Query(" select b from Booking b " +
-            "where b.bookerId = ?1 and " +
-            "b.start < ?2  and " +
-            "b.end > ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllCurrentByBookerId(Long userId, Instant currentTime);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long bookerId, Instant currentTime1, Instant currentTime2);
 
-    @Query(" select b from Booking b " +
-            "where b.bookerId = ?1 and " +
-            "b.start > ?2  and " +
-            "b.end > ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllFutureByBookerId(Long userId, Instant currentTime);
+    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Long userId, Instant currentTime);
 
-    @Query(" select b from Booking b " +
-            "where b.bookerId = ?1 and " +
-            "b.start < ?2  and " +
-            "b.end < ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllPastByBookerId(Long userId, Instant currentTime);
+    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Long userId, Instant currentTime);
 
-    @Query(" select b from Booking b " +
-            "where b.bookerId = ?1 and " +
-            "b.status = ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllWaitingByBookerId(Long userId, BookingStatus state);
-
-    @Query(" select b from Booking b " +
-            "where b.bookerId = ?1 and " +
-            "b.status = ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllRejectedByBookerId(Long userId, BookingStatus state);
-
+    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Long userId, BookingStatus state);
 
     @Query(" select b " +
             "from Booking b left join Item i on b.itemId = i.id " +
@@ -91,28 +65,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by b.start desc ")
     List<Booking> findAllRejectedBookingsByItemOwner(Long userId, BookingStatus state);
 
-    @Query(" select b " +
-            "from Booking b " +
-            "where b.itemId = ?1 and " +
-            "b.end < ?2 " +
-            "order by b.end desc ")
-    List<Booking> findLastBookingsByItemId(Long itemId, Instant currentTime);
+    List<Booking> findAllByItemIdAndEndBeforeOrderByEndDesc(Long itemId, Instant currentTime);
 
-    @Query(" select b " +
-            "from Booking b " +
-            "where b.itemId = ?1 and " +
-            "b.start > ?2 " +
-            "order by b.start asc ")
-    List<Booking> findNextBookingsByItemId(Long itemId, Instant currentTime);
+    List<Booking> findAllByItemIdAndEndAfterOrderByEndDesc(Long itemId, Instant currentTime);
 
     List<Booking> findAllByBookerIdAndItemIdAndEndIsBefore(Long bookerId, Long itemId, Instant currentTime);
 
-    @Query(" select b " +
-            "from Booking b " +
-            "where b.itemId = ?1 and " +
-            "b.end > ?2 and " +
-            "b.start < ?3 "
-    )
-    Optional<Booking> findCurrentAndApprovedBookingForItem(Long itemId, Instant start, Instant end);
-
+    Optional<Booking> findByItemIdAndEndAfterAndStartBeforeOrderByStartDesc(Long itemId, Instant start, Instant end);
 }

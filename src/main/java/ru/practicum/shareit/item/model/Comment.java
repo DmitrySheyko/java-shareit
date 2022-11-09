@@ -10,14 +10,14 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
+@Entity (name = "comments")
 @Table
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "comment_text", nullable = false)
+    @Column(name = "comment_text", nullable = false, length = 500)
     private String text;
 
     @Column(name = "item_id", nullable = false)

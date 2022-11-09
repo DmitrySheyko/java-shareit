@@ -21,27 +21,25 @@ public class CommentMapper {
     public CommentResponseDto toCommentResponseDto(Comment comment) {
         if (comment == null) {
             return null;
-        } else {
-            return CommentResponseDto.builder()
-                    .id(comment.getId())
-                    .authorName(userServiceImpl.findById(comment.getAuthor()).getName())
-                    .text(comment.getText())
-                    .created(instantToString(comment.getCreated()))
-                    .build();
         }
+        return CommentResponseDto.builder()
+                .id(comment.getId())
+                .authorName(userServiceImpl.findById(comment.getAuthor()).getName())
+                .text(comment.getText())
+                .created(instantToString(comment.getCreated()))
+                .build();
     }
 
     public Comment toEntity(CommentRequestDto commentRequestDto) {
         if (commentRequestDto == null) {
             return null;
-        } else {
-            return Comment.builder()
-                    .id(commentRequestDto.getId())
-                    .author(commentRequestDto.getAuthor())
-                    .item(commentRequestDto.getItem())
-                    .text(commentRequestDto.getText())
-                    .build();
         }
+        return Comment.builder()
+                .id(commentRequestDto.getId())
+                .author(commentRequestDto.getAuthor())
+                .item(commentRequestDto.getItem())
+                .text(commentRequestDto.getText())
+                .build();
     }
 
     private String instantToString(Instant instantTime) {

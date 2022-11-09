@@ -29,12 +29,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
     private final UserServiceImpl userServiceImpl;
     private final ItemServiceImpl itemServiceImpl;
-    private static final String ALL_REQUEST = "ALL";
-    private static final String CURRENT_REQUEST = "CURRENT";
-    private static final String PAST_REQUEST = "PAST";
-    private static final String FUTURE_REQUEST = "FUTURE";
-    private static final String WAITING_REQUEST = "WAITING";
-    private static final String REJECTED_REQUEST = "REJECTED";
 
     @Override
     public BookingResponseDto add(BookingRequestDto bookingRequestDto) {
@@ -62,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
         checkIsBookingInStorage(bookingId);
         checkIsUserOwnerOfBookedItem(userId, bookingId);
         Booking bookingForUpdate = findById(bookingId);
-        if (bookingForUpdate.getStatus().equals(BookingStatus.APPROVED)) {
+        if (bookingForUpdate.getStatus() == (BookingStatus.APPROVED)) {
             log.warn(String.format("Статус бронирование id=%s не может  быть изменен.", bookingId));
             throw new ValidationException(String.format("Статус бронирование id=%s не может  быть изменен.",
                     bookingId));
@@ -98,29 +92,31 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseDto> getAllBookingsByBookerId(Long userId, String state) {
         userServiceImpl.checkIsUserInStorage(userId);
         List<Booking> result;
-        switch (state) {
-            case (ALL_REQUEST): {
+        switch (RequestState.valueOf(state)) {
+            case ALL: {
                 result = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
                 break;
             }
-            case (CURRENT_REQUEST): {
-                result = bookingRepository.findAllCurrentByBookerId(userId, Instant.now());
+            case CURRENT: {
+                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId
+                        , Instant.now(), Instant.now());
                 break;
             }
-            case (FUTURE_REQUEST): {
-                result = bookingRepository.findAllFutureByBookerId(userId, Instant.now());
+            case FUTURE: {
+                result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, Instant.now());
                 break;
             }
-            case (PAST_REQUEST): {
-                result = bookingRepository.findAllPastByBookerId(userId, Instant.now());
+            case PAST: {
+                result = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, Instant.now());
                 break;
             }
-            case (WAITING_REQUEST): {
-                result = bookingRepository.findAllWaitingByBookerId(userId, BookingStatus.WAITING);
+            case WAITING: {
+                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId,
+                        BookingStatus.WAITING);
                 break;
             }
-            case (REJECTED_REQUEST): {
-                result = bookingRepository.findAllRejectedByBookerId(userId, BookingStatus.REJECTED);
+            case REJECTED: {
+                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
                 break;
             }
             default: {
@@ -135,28 +131,28 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseDto> getAllBookingsByOwnerItems(Long userId, String state) {
         userServiceImpl.checkIsUserInStorage(userId);
         List<Booking> result;
-        switch (state) {
-            case (ALL_REQUEST): {
+        switch (RequestState.valueOf(state)) {
+            case ALL: {
                 result = bookingRepository.findAllBookingsByItemOwner(userId);
                 break;
             }
-            case (CURRENT_REQUEST): {
+            case CURRENT: {
                 result = bookingRepository.findAllCurrentBookingsByItemOwner(userId, Instant.now());
                 break;
             }
-            case (FUTURE_REQUEST): {
+            case FUTURE: {
                 result = bookingRepository.findAllFutureBookingsByItemOwner(userId, Instant.now());
                 break;
             }
-            case (PAST_REQUEST): {
+            case PAST: {
                 result = bookingRepository.findAllPastBookingsByItemOwner(userId, Instant.now());
                 break;
             }
-            case (WAITING_REQUEST): {
+            case WAITING: {
                 result = bookingRepository.findAllWaitingBookingsByItemOwner(userId, BookingStatus.WAITING);
                 break;
             }
-            case (REJECTED_REQUEST): {
+            case REJECTED: {
                 result = bookingRepository.findAllRejectedBookingsByItemOwner(userId, BookingStatus.REJECTED);
                 break;
             }
@@ -179,8 +175,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkIsItemCanBeBooked(Long itemId, Instant start, Instant end) {
-        Optional<Booking> optionalBooking = bookingRepository.findCurrentAndApprovedBookingForItem(itemId,
-                start, end);
+        Optional<Booking> optionalBooking = bookingRepository.
+                findByItemIdAndEndAfterAndStartBeforeOrderByStartDesc(itemId, start, end);
         if (!optionalBooking.isEmpty()) {
             log.warn(String.format("Объект id=%s не доступен для бронирования.", itemId));
             throw new ValidationException(String.format("Объект id=%s не доступен для бронирования.", itemId));
@@ -209,14 +205,12 @@ public class BookingServiceImpl implements BookingService {
 
     private boolean checkIsUserCreatorOfBooking(Long userId, Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-        Booking booking;
         if (optionalBooking.isPresent()) {
-            booking = optionalBooking.get();
+            return userId.equals(optionalBooking.get().getBookerId());
         } else {
             log.warn(String.format("Информация о бронировании id=%s не найдена.", bookingId));
             throw new ObjectNotFoundException(String.format("Информация о бронировании id=%s не найдена.", bookingId));
         }
-        return userId.equals(booking.getBookerId());
     }
 
     private boolean checkIsUserOwnerOfItem(Long userId, Long itemId) {

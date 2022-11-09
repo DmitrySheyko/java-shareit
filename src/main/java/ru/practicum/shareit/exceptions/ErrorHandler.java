@@ -23,6 +23,12 @@ public class ErrorHandler {
         return new Error(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Error handlerOfIllegalArgumentException(final IllegalArgumentException e) {
+        return new Error("Unknown state: UNSUPPORTED_STATUS");
+    }
+
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

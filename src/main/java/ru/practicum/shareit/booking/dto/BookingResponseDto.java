@@ -18,6 +18,4 @@ public class BookingResponseDto {
     private Item item;
     private UserDto booker;
     private BookingStatus status;
-
-
 }

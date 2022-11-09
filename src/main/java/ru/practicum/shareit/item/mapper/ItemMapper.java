@@ -21,6 +21,9 @@ public class ItemMapper {
     private final BookingRepository bookingRepository;
 
     public ItemResponseResponseDto toDtoForOtherUsers(Item item, List<CommentResponseDto> listOfComments) {
+        if (item == null) {
+            return null;
+        }
         return ItemResponseResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -36,21 +39,23 @@ public class ItemMapper {
     public ItemResponseResponseDtoForOwner toDtoForOwner(Item item, List<CommentResponseDto> listOfComments) {
         if (item == null) {
             return null;
-        } else {
-            return ItemResponseResponseDtoForOwner.builder()
-                    .id(item.getId())
-                    .name(item.getName())
-                    .description(item.getDescription())
-                    .available(item.getAvailable())
-                    .request(item.getRequest())
-                    .lastBooking(findLastBookingsByItemId(item.getId()))
-                    .nextBooking(findNextBookingsByItemId(item.getId()))
-                    .comments(listOfComments)
-                    .build();
         }
+        return ItemResponseResponseDtoForOwner.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .request(item.getRequest())
+                .lastBooking(findLastBookingsByItemId(item.getId()))
+                .nextBooking(findNextBookingsByItemId(item.getId()))
+                .comments(listOfComments)
+                .build();
     }
 
     public Item requestDtoToEntity(ItemRequestDto itemRequestDto) {
+        if (itemRequestDto == null) {
+            return null;
+        }
         return Item.builder()
                 .id(itemRequestDto.getId())
                 .name(itemRequestDto.getName())
@@ -61,20 +66,15 @@ public class ItemMapper {
     }
 
     public Booking findLastBookingsByItemId(Long itemId) {
-        List<Booking> listOfBookings = bookingRepository.findLastBookingsByItemId(itemId, Instant.now());
-        if (listOfBookings.isEmpty()) {
-            return null;
-        } else {
-            return listOfBookings.get(0);
-        }
+        List<Booking> listOfBookings = bookingRepository.findAllByItemIdAndEndBeforeOrderByEndDesc(itemId, Instant.now());
+        return listOfBookings.isEmpty() ? null : listOfBookings.get(0);
     }
 
     public Booking findNextBookingsByItemId(Long itemId) {
-        List<Booking> listOfBookings = bookingRepository.findNextBookingsByItemId(itemId, Instant.now());
+        List<Booking> listOfBookings = bookingRepository.findAllByItemIdAndEndAfterOrderByEndDesc(itemId, Instant.now());
         if (listOfBookings.isEmpty()) {
             return null;
-        } else {
-            return listOfBookings.get(0);
         }
+        return listOfBookings.get(0);
     }
 }
