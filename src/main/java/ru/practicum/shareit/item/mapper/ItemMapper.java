@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
@@ -65,16 +66,30 @@ public class ItemMapper {
                 .build();
     }
 
-    public Booking findLastBookingsByItemId(Long itemId) {
+    public BookingItemDto findLastBookingsByItemId(Long itemId) {
         List<Booking> listOfBookings = bookingRepository.findAllByItemIdAndEndBeforeOrderByEndDesc(itemId, Instant.now());
-        return listOfBookings.isEmpty() ? null : listOfBookings.get(0);
+        if (listOfBookings.isEmpty()) {
+            return null;
+        } else {
+            Booking booking = listOfBookings.get(0);
+            return BookingItemDto.builder()
+                    .id(booking.getId())
+                    .bookerId(booking.getBooker().getId())
+                    .build();
+        }
+
+
     }
 
-    public Booking findNextBookingsByItemId(Long itemId) {
+    public BookingItemDto findNextBookingsByItemId(Long itemId) {
         List<Booking> listOfBookings = bookingRepository.findAllByItemIdAndEndAfterOrderByEndDesc(itemId, Instant.now());
         if (listOfBookings.isEmpty()) {
             return null;
         }
-        return listOfBookings.get(0);
+        Booking booking = listOfBookings.get(0);
+        return BookingItemDto.builder()
+                .id(booking.getId())
+                .bookerId(booking.getBooker().getId())
+                .build();
     }
 }

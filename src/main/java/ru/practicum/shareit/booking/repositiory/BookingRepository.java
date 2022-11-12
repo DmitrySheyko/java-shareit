@@ -22,13 +22,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Long userId, BookingStatus state);
 
     @Query(" select b " +
-            "from Booking b left join Item i on b.itemId = i.id " +
+            "from Booking b left join Item i on b.item = i.id " +
             "where i.owner = ?1 " +
             "order by b.start desc ")
     List<Booking> findAllBookingsByItemOwner(Long userId);
 
     @Query(" select b " +
-            "from Booking b left join Item i on b.itemId = i.id " +
+            "from Booking b left join Item i on b.item = i.id " +
             "where i.owner = ?1 and " +
             "b.start < ?2  and " +
             "b.end > ?2 " +
@@ -36,7 +36,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllCurrentBookingsByItemOwner(Long userId, Instant currentTime);
 
     @Query(" select b " +
-            "from Booking b left join Item i on b.itemId = i.id " +
+            "from Booking b left join Item i on b.item = i.id " +
             "where i.owner = ?1 and " +
             "b.start > ?2  and " +
             "b.end > ?2 " +
@@ -44,7 +44,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllFutureBookingsByItemOwner(Long userId, Instant currentTime);
 
     @Query(" select b " +
-            "from Booking b left join Item i on b.itemId = i.id " +
+            "from Booking b left join Item i on b.item = i.id " +
             "where i.owner = ?1 and " +
             "b.start < ?2  and " +
             "b.end < ?2 " +
@@ -52,14 +52,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllPastBookingsByItemOwner(Long userId, Instant currentTime);
 
     @Query(" select b " +
-            "from Booking b left join Item i on b.itemId = i.id " +
+            "from Booking b left join Item i on b.item = i.id " +
             "where i.owner = ?1 and " +
             "b.status = ?2 " +
             "order by b.start desc ")
     List<Booking> findAllWaitingBookingsByItemOwner(Long userId, BookingStatus state);
 
     @Query(" select b " +
-            "from Booking b left join Item i on b.itemId = i.id " +
+            "from Booking b left join Item i on b.item = i.id " +
             "where i.owner = ?1 and " +
             "b.status = ?2 " +
             "order by b.start desc ")

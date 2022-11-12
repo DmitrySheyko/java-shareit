@@ -4,6 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 @Getter
 @Setter
@@ -16,6 +17,6 @@ public class BookingResponseDto {
     private String start;
     private String end;
     private Item item;
-    private UserDto booker;
+    private User booker;
     private BookingStatus status;
 }

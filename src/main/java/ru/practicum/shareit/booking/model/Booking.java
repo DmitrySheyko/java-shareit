@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.model;
 
 import lombok.*;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.Future;
@@ -26,11 +28,13 @@ public class Booking {
     @Column(name = "end_date", nullable = false)
     private Instant end;
 
-    @Column(name = "item_id", nullable = false)
-    private Long itemId;
+    @OneToOne
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 
-    @Column(name = "booker_id", nullable = false)
-    private Long bookerId;
+    @OneToOne
+    @JoinColumn(name = "booker_id", nullable = false)
+    private User booker;
 
     @Column(name = "status", nullable = false)
     private BookingStatus status;
@@ -45,8 +49,8 @@ public class Booking {
         if (!id.equals(booking.id)) return false;
         if (!start.equals(booking.start)) return false;
         if (!end.equals(booking.end)) return false;
-        if (!itemId.equals(booking.itemId)) return false;
-        if (!bookerId.equals(booking.bookerId)) return false;
+        if (!item.equals(booking.item)) return false;
+        if (!booker.equals(booking.booker)) return false;
         return status == booking.status;
     }
 
@@ -55,8 +59,8 @@ public class Booking {
         int result = id.hashCode();
         result = 31 * result + start.hashCode();
         result = 31 * result + end.hashCode();
-        result = 31 * result + itemId.hashCode();
-        result = 31 * result + bookerId.hashCode();
+        result = 31 * result + item.hashCode();
+        result = 31 * result + booker.hashCode();
         result = 31 * result + status.hashCode();
         return result;
     }

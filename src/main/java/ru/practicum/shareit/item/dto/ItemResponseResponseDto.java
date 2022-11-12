@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.request.model.ItemRequest;
 
@@ -18,7 +19,7 @@ public class ItemResponseResponseDto implements ResponseDto {
     private String description;
     private Boolean available;
     private ItemRequest request;
-    private Booking lastBooking;
-    private Booking nextBooking;
+    private BookingItemDto lastBooking;
+    private BookingItemDto nextBooking;
     private List<CommentResponseDto> comments;
 }

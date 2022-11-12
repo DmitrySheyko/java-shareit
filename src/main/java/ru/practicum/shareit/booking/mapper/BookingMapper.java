@@ -27,8 +27,8 @@ public class BookingMapper {
         }
         BookingResponseDto bookingResponseDto = new BookingResponseDto();
         bookingResponseDto.setId(booking.getId());
-        bookingResponseDto.setBooker(userService.getById(booking.getBookerId()));
-        bookingResponseDto.setItem(itemService.findById(booking.getItemId()));
+        bookingResponseDto.setBooker(booking.getBooker());
+        bookingResponseDto.setItem(booking.getItem());
         bookingResponseDto.setStart(instantToString(booking.getStart()));
         bookingResponseDto.setEnd(instantToString(booking.getEnd()));
         bookingResponseDto.setStatus(booking.getStatus());
@@ -40,8 +40,8 @@ public class BookingMapper {
             return null;
         }
         Booking booking = new Booking();
-        booking.setBookerId(bookingRequestDto.getBookerId());
-        booking.setItemId(bookingRequestDto.getItemId());
+        booking.setBooker(userService.findById(bookingRequestDto.getBookerId()));
+        booking.setItem(itemService.findById(bookingRequestDto.getItemId()));
         booking.setStart(stringToInstant(bookingRequestDto.getStart()));
         booking.setEnd(stringToInstant(bookingRequestDto.getEnd()));
         booking.setStatus(bookingRequestDto.getStatus());

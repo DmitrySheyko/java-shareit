@@ -37,8 +37,8 @@ public class BookingServiceImpl implements BookingService {
         itemServiceImpl.checkIsItemAvailable(bookingRequestDto.getItemId());
         Booking booking = bookingMapper.requestDtoToEntity(bookingRequestDto);
         checkBookingTime(booking);
-        checkIsItemCanBeBooked(booking.getItemId(), booking.getStart(), booking.getEnd());
-        if (checkIsUserOwnerOfItem(booking.getBookerId(), booking.getItemId())) {
+        checkIsItemCanBeBooked(booking.getItem().getId(), booking.getStart(), booking.getEnd());
+        if (checkIsUserOwnerOfItem(booking.getBooker().getId(), booking.getItem().getId())) {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.",
                     bookingRequestDto.getBookerId()));
             throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  " +
@@ -61,10 +61,10 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException(String.format("Статус бронирование id=%s не может  быть изменен.",
                     bookingId));
         }
-        if (userId.equals(itemServiceImpl.findById(bookingForUpdate.getItemId()).getOwner())) {
+        if (userId.equals(itemServiceImpl.findById(bookingForUpdate.getItem().getId()).getOwner())) {
             bookingForUpdate.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         }
-        if (userId.equals(bookingForUpdate.getBookerId())) {
+        if (userId.equals(bookingForUpdate.getBooker())) {
             bookingForUpdate.setStatus(isApproved ? BookingStatus.WAITING : BookingStatus.CANCELED);
         }
         Booking updatedBooking = bookingRepository.save(bookingForUpdate);
@@ -185,14 +185,14 @@ public class BookingServiceImpl implements BookingService {
 
     private void checkBookingTime(Booking booking) {
         if (booking.getStart().isBefore(Instant.now())) {
-            log.warn(String.format("Некорректное время начала бронирования объекта id=%s.", booking.getBookerId()));
+            log.warn(String.format("Некорректное время начала бронирования объекта id=%s.", booking.getBooker()));
             throw new ValidationException(String.format("ОНекорректное время начала бронирования объекта id=%s.",
-                    booking.getBookerId()));
+                    booking.getBooker()));
         }
         if (booking.getEnd().isBefore(booking.getStart())) {
-            log.warn(String.format("Некорректное время окончания бронирования объекта id=%s.", booking.getBookerId()));
+            log.warn(String.format("Некорректное время окончания бронирования объекта id=%s.", booking.getBooker()));
             throw new ValidationException(String.format("ОНекорректное время окончания бронирования объекта id=%s.",
-                    booking.getBookerId()));
+                    booking.getBooker()));
         }
     }
 
@@ -206,7 +206,7 @@ public class BookingServiceImpl implements BookingService {
     private boolean checkIsUserCreatorOfBooking(Long userId, Long bookingId) {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
         if (optionalBooking.isPresent()) {
-            return userId.equals(optionalBooking.get().getBookerId());
+            return userId.equals(optionalBooking.get().getBooker().getId());
         } else {
             log.warn(String.format("Информация о бронировании id=%s не найдена.", bookingId));
             throw new ObjectNotFoundException(String.format("Информация о бронировании id=%s не найдена.", bookingId));
@@ -227,8 +227,8 @@ public class BookingServiceImpl implements BookingService {
             log.warn(String.format("Бронирование id=%s не найдено.", bookingId));
             throw new ObjectNotFoundException(String.format("Бронирование id=%s не найдено.", bookingId));
         }
-        Item item = itemServiceImpl.findById(booking.getItemId());
-        if (userId.equals(item.getOwner())) {
+//        Item item = itemServiceImpl.findById(booking.getItem().getId());
+        if (userId.equals(booking.getItem().getOwner())) {
             return true;
         } else {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
