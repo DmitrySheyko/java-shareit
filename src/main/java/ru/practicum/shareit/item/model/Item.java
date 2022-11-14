@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -36,8 +35,8 @@ public class Item {
     @NotNull(message = "Должен быть указан UserId владельца")
     private Long owner;
 
-    @Transient
-    private ItemRequest request;
+    @Column(name = "request_id")
+    private Long requestId;
 
     @Override
     public boolean equals(Object o) {
@@ -51,7 +50,7 @@ public class Item {
         if (!description.equals(item.description)) return false;
         if (!available.equals(item.available)) return false;
         if (!owner.equals(item.owner)) return false;
-        return Objects.equals(request, item.request);
+        return Objects.equals(requestId, item.requestId);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class Item {
         result = 31 * result + description.hashCode();
         result = 31 * result + available.hashCode();
         result = 31 * result + owner.hashCode();
-        result = 31 * result + (request != null ? request.hashCode() : 0);
+        result = 31 * result + (requestId != null ? requestId.hashCode() : 0);
         return result;
     }
 }

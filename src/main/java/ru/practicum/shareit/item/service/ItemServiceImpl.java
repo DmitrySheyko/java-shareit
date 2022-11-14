@@ -182,4 +182,9 @@ public class ItemServiceImpl implements ItemService {
             return optionalItem.get();
         }
     }
+//
+//    @Override
+//    public List<Item> findAllByRequestId(Long requestId){
+//        return itemRepository.findAllByRequestId(requestId);
+//    }
 }

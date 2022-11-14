@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(path = "/users")
 public class UserController {
-    UserService userService;
+    private final UserService userService;
 
     @PostMapping
     public UserDto add(@RequestBody @Valid UserDto userDto) {

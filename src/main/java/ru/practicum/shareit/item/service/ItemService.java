@@ -25,4 +25,6 @@ public interface ItemService {
     void checkIsItemAvailable(Long itemId);
 
     Item findById(Long itemId);
+//
+//    List<Item> findAllByRequestId(Long requestId);
 }

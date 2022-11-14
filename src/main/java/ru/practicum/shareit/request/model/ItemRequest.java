@@ -1,10 +1,12 @@
 package ru.practicum.shareit.request.model;
 
 import lombok.*;
+import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * TODO Sprint add-item-requests.
@@ -30,6 +32,10 @@ public class ItemRequest {
     @Column(name = "created")
     private Instant created;
 
+    @OneToMany
+    @JoinColumn(name="request_id", referencedColumnName="id")
+    private List<Item> answersList;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,5 +56,16 @@ public class ItemRequest {
         result = 31 * result + requestor.hashCode();
         result = 31 * result + created.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemRequest{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", requestor=" + requestor +
+                ", created=" + created +
+                ", answersList=" + answersList +
+                '}';
     }
 }

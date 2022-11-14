@@ -17,5 +17,6 @@ public class ItemRequestDto {
     @NotBlank(message = "В запросе не предостален id пользователя")
     private Long owner;
     private Boolean available;
+    private Long requestId;
 }
 

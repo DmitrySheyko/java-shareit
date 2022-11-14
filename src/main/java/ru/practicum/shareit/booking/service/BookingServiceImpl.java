@@ -1,7 +1,12 @@
 package ru.practicum.shareit.booking.service;
 
+import com.sun.xml.bind.v2.TODO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -88,35 +93,38 @@ public class BookingServiceImpl implements BookingService {
         return bookingResponseDto;
     }
 
+    //TODO убрать сортировку из названия методов.
     @Override
-    public List<BookingResponseDto> getAllBookingsByBookerId(Long userId, String state) {
+    public List<BookingResponseDto> getAllBookingsByBookerId(Long userId, String state, int from, int size) {
         userServiceImpl.checkIsUserInStorage(userId);
-        List<Booking> result;
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
+        Page<Booking> result;
         switch (RequestState.valueOf(state)) {
             case ALL: {
-                result = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                result = bookingRepository.findAllByBookerIdOrderByStartDesc(pageable, userId);
                 break;
             }
             case CURRENT: {
-                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
+                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(pageable, userId,
                         Instant.now(), Instant.now());
                 break;
             }
             case FUTURE: {
-                result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, Instant.now());
+                result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(pageable, userId, Instant.now());
                 break;
             }
             case PAST: {
-                result = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, Instant.now());
+                result = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(pageable, userId, Instant.now());
                 break;
             }
             case WAITING: {
-                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId,
+                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(pageable, userId,
                         BookingStatus.WAITING);
                 break;
             }
             case REJECTED: {
-                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(pageable, userId, BookingStatus.REJECTED);
                 break;
             }
             default: {
@@ -128,32 +136,34 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookingsByOwnerItems(Long userId, String state) {
+    public List<BookingResponseDto> getAllBookingsByOwnerItems(Long userId, String state, int from, int size) {
         userServiceImpl.checkIsUserInStorage(userId);
-        List<Booking> result;
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
+        Page<Booking> result;
         switch (RequestState.valueOf(state)) {
             case ALL: {
-                result = bookingRepository.findAllBookingsByItemOwner(userId);
+                result = bookingRepository.findAllBookingsByItemOwner(pageable, userId);
                 break;
             }
             case CURRENT: {
-                result = bookingRepository.findAllCurrentBookingsByItemOwner(userId, Instant.now());
+                result = bookingRepository.findAllCurrentBookingsByItemOwner(pageable, userId, Instant.now());
                 break;
             }
             case FUTURE: {
-                result = bookingRepository.findAllFutureBookingsByItemOwner(userId, Instant.now());
+                result = bookingRepository.findAllFutureBookingsByItemOwner(pageable, userId, Instant.now());
                 break;
             }
             case PAST: {
-                result = bookingRepository.findAllPastBookingsByItemOwner(userId, Instant.now());
+                result = bookingRepository.findAllPastBookingsByItemOwner(pageable, userId, Instant.now());
                 break;
             }
             case WAITING: {
-                result = bookingRepository.findAllWaitingBookingsByItemOwner(userId, BookingStatus.WAITING);
+                result = bookingRepository.findAllWaitingBookingsByItemOwner(pageable, userId, BookingStatus.WAITING);
                 break;
             }
             case REJECTED: {
-                result = bookingRepository.findAllRejectedBookingsByItemOwner(userId, BookingStatus.REJECTED);
+                result = bookingRepository.findAllRejectedBookingsByItemOwner(pageable, userId, BookingStatus.REJECTED);
                 break;
             }
             default: {
