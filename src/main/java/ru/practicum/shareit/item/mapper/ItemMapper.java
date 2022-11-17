@@ -8,8 +8,8 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
-import ru.practicum.shareit.item.dto.ItemResponseResponseDto;
-import ru.practicum.shareit.item.dto.ItemResponseResponseDtoForOwner;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseDtoForOwner;
 import ru.practicum.shareit.item.model.Item;
 
 import java.time.Instant;
@@ -21,11 +21,11 @@ import java.util.List;
 public class ItemMapper {
     private final BookingRepository bookingRepository;
 
-    public ItemResponseResponseDto toDtoForOtherUsers(Item item, List<CommentResponseDto> listOfComments) {
+    public ItemResponseDto toItemResponseDto(Item item, List<CommentResponseDto> listOfComments) {
         if (item == null) {
             return null;
         }
-        return ItemResponseResponseDto.builder()
+        return ItemResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
@@ -37,11 +37,11 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemResponseResponseDtoForOwner toDtoForOwner(Item item, List<CommentResponseDto> listOfComments) {
+    public ItemResponseDtoForOwner toItemResponseDtoForOwner(Item item, List<CommentResponseDto> listOfComments) {
         if (item == null) {
             return null;
         }
-        return ItemResponseResponseDtoForOwner.builder()
+        return ItemResponseDtoForOwner.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
@@ -78,8 +78,6 @@ public class ItemMapper {
                     .bookerId(booking.getBooker().getId())
                     .build();
         }
-
-
     }
 
     public BookingItemDto findNextBookingsByItemId(Long itemId) {

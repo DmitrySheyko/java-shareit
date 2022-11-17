@@ -5,7 +5,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.Future;
 import java.time.Instant;
 
 @Getter
@@ -20,11 +19,11 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Future(message = "Некоректная дата начала бронирования")
+//    @Future(message = "Некоректная дата начала бронирования")
     @Column(name = "start_date", nullable = false)
     private Instant start;
 
-    @Future(message = "Некоректная дата окончания бронирования")
+//    @Future(message = "Некоректная дата окончания бронирования")
     @Column(name = "end_date", nullable = false)
     private Instant end;
 

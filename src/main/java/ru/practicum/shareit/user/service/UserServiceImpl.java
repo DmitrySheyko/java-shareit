@@ -30,16 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDtoForUpdate) {
-        checkIsUserInStorage(userDtoForUpdate.getId());
-        User userFromStorage;
-        Optional<User> optionalUserFromStorage = userRepository.findById(userDtoForUpdate.getId());
-        if (optionalUserFromStorage.isPresent()) {
-            userFromStorage = optionalUserFromStorage.get();
-        } else {
-            log.warn(String.format("Данные пользователя id=%s не найдены.", userDtoForUpdate.getId()));
-            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.",
-                    userDtoForUpdate.getId()));
-        }
+        checkIsObjectInStorage(userDtoForUpdate.getId());
+        User userFromStorage = findById(userDtoForUpdate.getId());
         if (userDtoForUpdate.getEmail() == null) {
             userDtoForUpdate.setEmail(userFromStorage.getEmail());
         }
@@ -51,27 +43,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getById(Long userId) throws ObjectNotFoundException {
-        if (userRepository.existsById(userId)) {
-            Optional<User> optionalUser = userRepository.findById(userId);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                log.info(String.format("Получены данные пользователя id=%s.", userId));
-                return userMapper.toDtoForOtherUsers(user);
-            } else {
-                log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
-                throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
-            }
-        } else {
-            log.warn(String.format("Пользователь id=%s не найден.", userId));
-            throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
-        }
+    public UserDto getById(Long userId) {
+        checkIsObjectInStorage(userId);
+        User user = findById(userId);
+        UserDto result = userMapper.toDtoForOtherUsers(user);
+        log.info(String.format("Получены данные пользователя id=%s.", userId));
+        return result;
     }
 
     @Override
     public List<UserDto> getAll() {
         List<User> listOfUsers = userRepository.findAll();
-        log.info("Получены список всех пользователей");
+        log.info("Получен список всех пользователей");
         return listOfUsers.stream().map(userMapper::toDtoForOtherUsers).collect(Collectors.toList());
     }
 
@@ -88,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void checkIsUserInStorage(Long userId) {
+    public void checkIsObjectInStorage(Long userId) {
         if (!userRepository.existsById(userId)) {
             log.warn(String.format("Пользователь id=%s не найден.", userId));
             throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.service;
 
-import com.sun.xml.bind.v2.TODO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDto add(BookingRequestDto bookingRequestDto) {
-        userServiceImpl.checkIsUserInStorage(bookingRequestDto.getBookerId());
+        userServiceImpl.checkIsObjectInStorage(bookingRequestDto.getBookerId());
         itemServiceImpl.checkIsItemInStorage(bookingRequestDto.getItemId());
         itemServiceImpl.checkIsItemAvailable(bookingRequestDto.getItemId());
         Booking booking = bookingMapper.requestDtoToEntity(bookingRequestDto);
@@ -57,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDto update(Long userId, Long bookingId, Boolean isApproved) {
-        userServiceImpl.checkIsUserInStorage(userId);
+        userServiceImpl.checkIsObjectInStorage(userId);
         checkIsBookingInStorage(bookingId);
         checkIsUserOwnerOfBookedItem(userId, bookingId);
         Booking bookingForUpdate = findById(bookingId);
@@ -80,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDto getById(Long userId, Long bookingId) {
-        userServiceImpl.checkIsUserInStorage(userId);
+        userServiceImpl.checkIsObjectInStorage(userId);
         checkIsBookingInStorage(bookingId);
         if (!(checkIsUserCreatorOfBooking(userId, bookingId) || checkIsUserOwnerOfBookedItem(userId, bookingId))) {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.", userId));
@@ -89,42 +88,41 @@ public class BookingServiceImpl implements BookingService {
         }
         Booking booking = findById(bookingId);
         BookingResponseDto bookingResponseDto = bookingMapper.entityToResponseDto(booking);
-        log.info(String.format("Бронирование id=%s успешно получено.", bookingId));
+        log.info(String.format("Данные о бронировании id=%s успешно получено.", bookingId));
         return bookingResponseDto;
     }
 
-    //TODO убрать сортировку из названия методов.
     @Override
     public List<BookingResponseDto> getAllBookingsByBookerId(Long userId, String state, int from, int size) {
-        userServiceImpl.checkIsUserInStorage(userId);
+        userServiceImpl.checkIsObjectInStorage(userId);
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
         Page<Booking> result;
         switch (RequestState.valueOf(state)) {
             case ALL: {
-                result = bookingRepository.findAllByBookerIdOrderByStartDesc(pageable, userId);
+                result = bookingRepository.findAllByBookerId(pageable, userId);
                 break;
             }
             case CURRENT: {
-                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(pageable, userId,
+                result = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(pageable, userId,
                         Instant.now(), Instant.now());
                 break;
             }
             case FUTURE: {
-                result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(pageable, userId, Instant.now());
+                result = bookingRepository.findAllByBookerIdAndStartAfter(pageable, userId, Instant.now());
                 break;
             }
             case PAST: {
-                result = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(pageable, userId, Instant.now());
+                result = bookingRepository.findAllByBookerIdAndEndBefore(pageable, userId, Instant.now());
                 break;
             }
             case WAITING: {
-                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(pageable, userId,
+                result = bookingRepository.findAllByBookerIdAndStatus(pageable, userId,
                         BookingStatus.WAITING);
                 break;
             }
             case REJECTED: {
-                result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(pageable, userId, BookingStatus.REJECTED);
+                result = bookingRepository.findAllByBookerIdAndStatus(pageable, userId, BookingStatus.REJECTED);
                 break;
             }
             default: {
@@ -137,33 +135,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDto> getAllBookingsByOwnerItems(Long userId, String state, int from, int size) {
-        userServiceImpl.checkIsUserInStorage(userId);
+        userServiceImpl.checkIsObjectInStorage(userId);
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
         Page<Booking> result;
         switch (RequestState.valueOf(state)) {
             case ALL: {
-                result = bookingRepository.findAllBookingsByItemOwner(pageable, userId);
+                result = bookingRepository.findAllByItemOwner(pageable, userId);
                 break;
             }
             case CURRENT: {
-                result = bookingRepository.findAllCurrentBookingsByItemOwner(pageable, userId, Instant.now());
+                result = bookingRepository.findAllByItemOwnerAndStartLessThanAndEndGreaterThan(pageable, userId, Instant.now(), Instant.now());
                 break;
             }
             case FUTURE: {
-                result = bookingRepository.findAllFutureBookingsByItemOwner(pageable, userId, Instant.now());
+                result = bookingRepository.findAllByItemOwnerAndStartGreaterThan(pageable, userId, Instant.now());
                 break;
             }
             case PAST: {
-                result = bookingRepository.findAllPastBookingsByItemOwner(pageable, userId, Instant.now());
+                result = bookingRepository.findAllByItemOwnerAndEndLessThan(pageable, userId, Instant.now());
                 break;
             }
             case WAITING: {
-                result = bookingRepository.findAllWaitingBookingsByItemOwner(pageable, userId, BookingStatus.WAITING);
+                result = bookingRepository.findAllByItemOwnerAndStatus(pageable, userId, BookingStatus.WAITING);
                 break;
             }
             case REJECTED: {
-                result = bookingRepository.findAllRejectedBookingsByItemOwner(pageable, userId, BookingStatus.REJECTED);
+                result = bookingRepository.findAllByItemOwnerAndStatus(pageable, userId, BookingStatus.REJECTED);
                 break;
             }
             default: {
@@ -188,20 +186,20 @@ public class BookingServiceImpl implements BookingService {
         Optional<Booking> optionalBooking = bookingRepository
                 .findByItemIdAndEndAfterAndStartBeforeOrderByStartDesc(itemId, start, end);
         if (!optionalBooking.isEmpty()) {
-            log.warn(String.format("Объект id=%s не доступен для бронирования.", itemId));
-            throw new ValidationException(String.format("Объект id=%s не доступен для бронирования.", itemId));
+            log.warn(String.format("Объект itemId=%s не доступен для бронирования.", itemId));
+            throw new ValidationException(String.format("Объект itemId=%s не доступен для бронирования.", itemId));
         }
     }
 
     private void checkBookingTime(Booking booking) {
         if (booking.getStart().isBefore(Instant.now())) {
             log.warn(String.format("Некорректное время начала бронирования объекта id=%s.", booking.getBooker()));
-            throw new ValidationException(String.format("ОНекорректное время начала бронирования объекта id=%s.",
+            throw new ValidationException(String.format("Некорректное время начала бронирования объекта id=%s.",
                     booking.getBooker()));
         }
         if (booking.getEnd().isBefore(booking.getStart())) {
             log.warn(String.format("Некорректное время окончания бронирования объекта id=%s.", booking.getBooker()));
-            throw new ValidationException(String.format("ОНекорректное время окончания бронирования объекта id=%s.",
+            throw new ValidationException(String.format("Некорректное время окончания бронирования объекта id=%s.",
                     booking.getBooker()));
         }
     }
@@ -237,7 +235,6 @@ public class BookingServiceImpl implements BookingService {
             log.warn(String.format("Бронирование id=%s не найдено.", bookingId));
             throw new ObjectNotFoundException(String.format("Бронирование id=%s не найдено.", bookingId));
         }
-//        Item item = itemServiceImpl.findById(booking.getItem().getId());
         if (userId.equals(booking.getItem().getOwner())) {
             return true;
         } else {

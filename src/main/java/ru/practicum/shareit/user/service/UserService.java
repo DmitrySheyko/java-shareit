@@ -17,7 +17,7 @@ public interface UserService {
 
     String delete(Long userId);
 
-    void checkIsUserInStorage(Long userId);
+    void checkIsObjectInStorage(Long userId);
 
     User findById(Long userId);
 

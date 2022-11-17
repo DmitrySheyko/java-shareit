@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
@@ -13,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemResponseResponseDtoForOwner implements ResponseDto {
+public class ItemResponseDtoForOwner implements ResponseDto {
     private Long id;
     private String name;
     private String description;

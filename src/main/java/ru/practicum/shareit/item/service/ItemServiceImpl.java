@@ -1,9 +1,16 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
@@ -17,6 +24,7 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
+import javax.validation.Valid;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -24,42 +32,37 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Slf4j
 @Service
 @AllArgsConstructor
+@Getter
+@Setter
+@Validated
 public class ItemServiceImpl implements ItemService {
-    private final ItemRepository itemRepository;
-    private final CommentRepository commentRepository;
-    private final BookingRepository bookingRepository;
-    private final ItemMapper itemMapper;
-    private final CommentMapper commentMapper;
-    private final UserServiceImpl userServiceImpl;
+    private ItemRepository itemRepository;
+    private CommentRepository commentRepository;
+    private BookingRepository bookingRepository;
+    private ItemMapper itemMapper;
+    private CommentMapper commentMapper;
+    private UserServiceImpl userServiceImpl;
 
     @Override
-    public ItemResponseResponseDto add(ItemRequestDto itemRequestDto) {
-        userServiceImpl.checkIsUserInStorage(itemRequestDto.getOwner());
+    public ItemResponseDto add(@Valid ItemRequestDto itemRequestDto) {
+        userServiceImpl.checkIsObjectInStorage(itemRequestDto.getOwner());
         Item newItem = itemMapper.requestDtoToEntity(itemRequestDto);
         Item addedItem = itemRepository.save(newItem);
-        ItemResponseResponseDto addedItemResponseDto = itemMapper.toDtoForOtherUsers(addedItem,
+        ItemResponseDto addedItemResponseDto = itemMapper.toItemResponseDto(addedItem,
                 Collections.emptyList());
         log.info(String.format("Объект id=%s успешно добавлен", addedItemResponseDto.getId()));
         return addedItemResponseDto;
     }
 
     @Override
-    public ItemResponseResponseDto update(ItemRequestDto itemRequestDto) {
-        userServiceImpl.checkIsUserInStorage(itemRequestDto.getOwner());
+    public ItemResponseDto update(ItemRequestDto itemRequestDto) {
+        userServiceImpl.checkIsObjectInStorage(itemRequestDto.getOwner());
         checkIsItemInStorage(itemRequestDto.getId());
-        Item itemFromStorage;
-        Optional<Item> optionalItemFromStorage = itemRepository.findById(itemRequestDto.getId());
-        if (optionalItemFromStorage.isEmpty()) {
-            log.warn(String.format("Информация об объекту itemId=%s не найдена",
-                    itemRequestDto.getId()));
-            throw new ObjectNotFoundException(String.format("Информация об объекту itemId=%s не найдена",
-                    itemRequestDto.getId()));
-        } else {
-            itemFromStorage = optionalItemFromStorage.get();
-        }
+        Item itemFromStorage = findById(itemRequestDto.getId());
         if (!Objects.equals(itemFromStorage.getOwner(), itemRequestDto.getOwner())) {
             log.warn(String.format("У пользователя userId=%s нет прав редактировать объект itemId=%s",
                     itemRequestDto.getOwner(), itemRequestDto.getId()));
@@ -74,42 +77,46 @@ public class ItemServiceImpl implements ItemService {
                 .orElse(itemFromStorage.getAvailable()));
         Item updatedItem = itemRepository.save(itemMapper.requestDtoToEntity(itemRequestDto));
         List<CommentResponseDto> listOfComments = findListOfComments(itemRequestDto.getId());
-        return itemMapper.toDtoForOtherUsers(updatedItem, listOfComments);
+        return itemMapper.toItemResponseDto(updatedItem, listOfComments);
     }
 
     @Override
     public ResponseDto getById(Long userId, Long itemId) {
-        userServiceImpl.checkIsUserInStorage(userId);
+        userServiceImpl.checkIsObjectInStorage(userId);
         checkIsItemInStorage(itemId);
         Item item = findById(itemId);
         List<CommentResponseDto> listOfComments = findListOfComments(itemId);
         if (userId.equals(item.getOwner())) {
-            ItemResponseResponseDtoForOwner itemResponseDtoForOwner = itemMapper.toDtoForOwner(item, listOfComments);
+            ItemResponseDtoForOwner itemResponseDtoForOwner = itemMapper.toItemResponseDtoForOwner(item, listOfComments);
             log.info(String.format("Объект itemId=%s успешно получен.", itemId));
             return itemResponseDtoForOwner;
         }
-        ItemResponseResponseDto itemResponseDto = itemMapper.toDtoForOtherUsers(item, listOfComments);
+        ItemResponseDto itemResponseDto = itemMapper.toItemResponseDto(item, listOfComments);
         log.info(String.format("Объект itemId=%s успешно получен.", itemId));
         return itemResponseDto;
     }
 
     @Override
-    public List<ItemResponseResponseDtoForOwner> getAllByOwner(Long userId) {
-        userServiceImpl.checkIsUserInStorage(userId);
-        List<Item> listOfItems = itemRepository.findAllByOwner(userId);
+    public List<ItemResponseDtoForOwner> getAllByOwner(Long userId, int from, int size) {
+        userServiceImpl.checkIsObjectInStorage(userId);
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Page<Item> listOfItems = itemRepository.findAllByOwner(userId, pageable);
         if (listOfItems != null) {
-            List<ItemResponseResponseDtoForOwner> listOfItemResponseDtoForOwners = listOfItems.stream()
-                    .map(item -> itemMapper.toDtoForOwner(item, findListOfComments(item.getId()))).collect(Collectors.toList());
+            List<ItemResponseDtoForOwner> listOfItemResponseDtoForOwners = listOfItems.stream()
+                    .map(item -> itemMapper.toItemResponseDtoForOwner(item, findListOfComments(item.getId())))
+                    .collect(Collectors.toList());
             log.info("Список объектов успешно получен.");
             return listOfItemResponseDtoForOwners;
         } else {
+            log.info("Список объектов пуст.");
             return Collections.emptyList();
         }
     }
 
     @Override
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
-        userServiceImpl.checkIsUserInStorage(commentRequestDto.getAuthor());
+        userServiceImpl.checkIsObjectInStorage(commentRequestDto.getAuthor());
         checkIsItemInStorage(commentRequestDto.getItem());
         if (commentRequestDto.getText().isBlank()) {
             log.warn("Текст комментария не корректный");
@@ -127,13 +134,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseResponseDto> search(String text) {
+    public List<ItemResponseDto> search(String text, int from, int size) {
         if (StringUtils.isBlank(text)) {
             return Collections.emptyList();
         }
-        List<Item> listOfItems = itemRepository.search(text);
-        List<ItemResponseResponseDto> listOfItemResponseDtoForOtherUsers = listOfItems.stream()
-                .map(item -> itemMapper.toDtoForOtherUsers(item, findListOfComments(item.getId())))
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Page<Item> listOfItems = itemRepository.search(text, pageable);
+        List<ItemResponseDto> listOfItemResponseDtoForOtherUsers = listOfItems.stream()
+                .map(item -> itemMapper.toItemResponseDto(item, findListOfComments(item.getId())))
                 .collect(Collectors.toList());
         log.info("Список объектов успешно получен.");
         return listOfItemResponseDtoForOtherUsers;
@@ -182,9 +191,4 @@ public class ItemServiceImpl implements ItemService {
             return optionalItem.get();
         }
     }
-//
-//    @Override
-//    public List<Item> findAllByRequestId(Long requestId){
-//        return itemRepository.findAllByRequestId(requestId);
-//    }
 }

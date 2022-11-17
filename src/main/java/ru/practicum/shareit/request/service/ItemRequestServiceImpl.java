@@ -32,7 +32,7 @@ public class ItemRequestServiceImpl {
     UserServiceImpl userService;
 
     public OutputItemRequestDto add(InputItemRequestDto inputItemRequestDto) {
-        userService.checkIsUserInStorage(inputItemRequestDto.getRequestor());
+        userService.checkIsObjectInStorage(inputItemRequestDto.getRequestor());
         System.out.println("1");
         ItemRequest itemRequest = itemRequestMapper.inputItemRequestDtoToEntity(inputItemRequestDto);
         System.out.println("2");
@@ -48,7 +48,7 @@ public class ItemRequestServiceImpl {
     }
 
     public List<OutputItemRequestDto> getAllOwn(Long userId) {
-        userService.checkIsUserInStorage(userId);
+        userService.checkIsObjectInStorage(userId);
         List<ItemRequest> requestsList = itemRequestRepository.findAllByRequestorOrderByCreatedDesc(userId);
         if (requestsList.isEmpty()) {
             log.info(String.format("Список заявок пользователя id=%s пуст", userId));
@@ -63,7 +63,7 @@ public class ItemRequestServiceImpl {
     }
 
     public List<OutputItemRequestDto> getAll(Long userId, int from, int size) {
-        userService.checkIsUserInStorage(userId);
+        userService.checkIsObjectInStorage(userId);
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
         Page<ItemRequest> requestsPage = itemRequestRepository.findAllByRequestorNot(pageable, userId);
@@ -75,7 +75,7 @@ public class ItemRequestServiceImpl {
     }
 
     public OutputItemRequestDto getById(Long userId, Long requestId) {
-        userService.checkIsUserInStorage(userId);
+        userService.checkIsObjectInStorage(userId);
         checkIsObjectInStorage(requestId);
         ItemRequest itemRequest = findById(requestId);
         OutputItemRequestDto result = itemRequestMapper.entityToOutputItemRequestDto(itemRequest);
