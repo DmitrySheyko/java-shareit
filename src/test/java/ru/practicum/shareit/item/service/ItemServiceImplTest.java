@@ -3,14 +3,9 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -23,7 +18,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.ConstraintViolationException;
-import java.time.Instant;
 import java.util.List;
 
 @Transactional
@@ -31,7 +25,6 @@ import java.util.List;
         properties = "spring.sql.init.data-locations=data-test.sql",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@ExtendWith(MockitoExtension.class)
 class ItemServiceImplTest {
     final ItemServiceImpl itemService;
     final ItemRepository itemRepository;
@@ -41,101 +34,318 @@ class ItemServiceImplTest {
     final CommentMapper commentMapper;
     final UserServiceImpl userServiceImpl;
 
-    @Mock
-    BookingRepository mockBookingRepository;
-
     @Test
     void add() {
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name("TestItem").description("Test description")
-                .owner(1L).available(true).build();
+        String name = "TestItem";
+        String description = "Test description";
+        Long owner = 1L;
+        Boolean available = true;
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name(name).description(description)
+                .owner(owner).available(available).build();
         ItemResponseDto itemResponseDto = itemService.add(itemRequestDto);
         Assertions.assertNotNull(itemResponseDto.getId());
-        Assertions.assertEquals(itemResponseDto.getName(), itemResponseDto.getName());
-        Assertions.assertEquals(itemResponseDto.getDescription(), itemResponseDto.getDescription());
-        Assertions.assertTrue(itemResponseDto.getAvailable());
+        Assertions.assertEquals(name, itemResponseDto.getName());
+        Assertions.assertEquals(description, itemResponseDto.getDescription());
+        Assertions.assertTrue(available);
 
-        ItemRequestDto requestWithoutName = ItemRequestDto.builder().description("Test description")
+        Long notExistsUserId = 100L;
+        ItemRequestDto itemRequestDtoWithNotExistUserId = ItemRequestDto.builder().name(name).description(description)
+                .owner(notExistsUserId).available(available).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.add(itemRequestDtoWithNotExistUserId));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveIncorrectName() {
+        ItemRequestDto itemRequestDtoWithNullName = ItemRequestDto.builder().description("Test description").owner(1L)
+                .available(true).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithNullName));
+
+        ItemRequestDto itemRequestDtoWithEmptyName = ItemRequestDto.builder().name("").description("Test description").owner(1L)
+                .available(true).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithEmptyName));
+
+        ItemRequestDto itemRequestDtoWithBlankName = ItemRequestDto.builder().name(" ").description("Test description").owner(1L)
+                .available(true).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithBlankName));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveIncorrectDescription() {
+        ItemRequestDto itemRequestDtoWithNullDescription = ItemRequestDto.builder().name("TestItem").owner(1L)
+                .available(true).build();
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithNullDescription));
+
+        ItemRequestDto itemRequestDtoWithEmptyDescription = ItemRequestDto.builder().name("TestItem").description("")
                 .owner(1L).available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(requestWithoutName));
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithEmptyDescription));
+
+        ItemRequestDto itemRequestDtoWithBlankDescription = ItemRequestDto.builder().name("TestItem").description(" ")
+                .owner(1L).available(true).build();
+        Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithBlankDescription));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveNullAvailable() {
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name("TestItem").description("Test description")
+                .owner(1L).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDto));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveNullOwner() {
+        ItemRequestDto itemRequestDtoWithNullOwner = ItemRequestDto.builder().name("TestItem").description("Test description")
+                .available(true).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithNullOwner));
     }
 
     @Test
     void update() {
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name("TestItem").description("Test description")
-                .owner(1L).available(true).build();
+        String name = "TestItem";
+        String description = "Test description";
+        Long owner = 1L;
+        Boolean available = true;
+        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name(name).description(description).owner(owner)
+                .available(available).build();
         ItemResponseDto newItemResponseDto = itemService.add(itemRequestDto);
-        ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(newItemResponseDto.getId()).name("Updated name")
-                .description("Updated description").available(false).owner(1L).build();
+        Long itemId = newItemResponseDto.getId();
+        String nameForUpdate = "UpdatedItem";
+        String descriptionForUpdate = "Updated description";
+        Boolean availableForUpdate = false;
+        ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(nameForUpdate)
+                .description(descriptionForUpdate).available(availableForUpdate).owner(owner).build();
         ItemResponseDto updatedItemResponseDto = itemService.update(itemDtoForUpdate);
-        Assertions.assertEquals(itemDtoForUpdate.getId(), updatedItemResponseDto.getId());
-        Assertions.assertEquals(itemDtoForUpdate.getName(), updatedItemResponseDto.getName());
-        Assertions.assertEquals(itemDtoForUpdate.getDescription(), updatedItemResponseDto.getDescription());
-        Assertions.assertEquals(itemDtoForUpdate.getAvailable(), updatedItemResponseDto.getAvailable());
+        Assertions.assertEquals(itemId, updatedItemResponseDto.getId());
+        Assertions.assertEquals(nameForUpdate, updatedItemResponseDto.getName());
+        Assertions.assertEquals(descriptionForUpdate, updatedItemResponseDto.getDescription());
+        Assertions.assertEquals(availableForUpdate, updatedItemResponseDto.getAvailable());
+    }
 
-        ItemRequestDto itemRequestWithIncorrectOwner = ItemRequestDto.builder().name("TestItem").description("Test description")
-                .owner(100L).available(true).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemRequestWithIncorrectOwner));
-        ItemRequestDto itemRequestWithIncorrectItem = ItemRequestDto.builder().id(100L).name("TestItem").description("Test description")
-                .owner(100L).available(true).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemRequestWithIncorrectItem));
-        itemDtoForUpdate = ItemRequestDto.builder().id(newItemResponseDto.getId()).owner(1L).available(true).build();
-        itemService.update(itemDtoForUpdate);
+    @Test
+    void shouldThrowExceptionWhenUpdateWithNotOwner() {
+        Long itemId = 1L;
+        Long owner = 2L;
+        String name = "TestItem";
+        String description = "Test description";
+        Boolean available = true;
+        ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(name)
+                .description(description).available(available).owner(owner).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemDtoForUpdate));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateWithNullOwner() {
+        Long itemId = 1L;
+        Long owner = null;
+        String name = "TestItem";
+        String description = "Test description";
+        Boolean available = true;
+        ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(name)
+                .description(description).available(available).owner(owner).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemDtoForUpdate));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdateWithNullItemId() {
+        Long itemId = null;
+        Long owner = 1L;
+        String name = "TestItem";
+        String description = "Test description";
+        Boolean available = true;
+        ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(name)
+                .description(description).available(available).owner(owner).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemDtoForUpdate));
     }
 
     @Test
     void getById() {
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name("ItemName").description("Description")
-                .owner(1L).available(true).build();
-        ItemResponseDto itemResponseDto = itemService.add(itemRequestDto);
-        Long itemId = itemResponseDto.getId();
-        ItemResponseDtoForOwner itemFromBd = (ItemResponseDtoForOwner) itemService.getById(1L, itemId);
-        Assertions.assertEquals(itemId, itemFromBd.getId());
-        Assertions.assertEquals(itemRequestDto.getName(), itemFromBd.getName());
-        Assertions.assertEquals(itemRequestDto.getDescription(), itemFromBd.getDescription());
-        Assertions.assertEquals(itemRequestDto.getAvailable(), itemFromBd.getAvailable());
+        Long itemId = 1L;
+        Long ownerId = 1L;
+        Long anotherUserId = 2L;
+
+        ResponseDto itemResponseDtoForOwner = itemService.getById(ownerId, itemId);
+        ResponseDto itemResponseDto = itemService.getById(anotherUserId, itemId);
+        Assertions.assertNotNull(((ItemResponseDtoForOwner) itemResponseDtoForOwner).getLastBooking());
+        Assertions.assertNotNull(((ItemResponseDtoForOwner) itemResponseDtoForOwner).getNextBooking());
+        Assertions.assertNull(((ItemResponseDto) itemResponseDto).getLastBooking());
+        Assertions.assertNull(((ItemResponseDto) itemResponseDto).getNextBooking());
+
+        Long notExistsItemId = 100L;
+        Long notExistsUserId = 100L;
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.getById(ownerId, notExistsUserId));
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.getById(notExistsItemId, itemId));
     }
 
     @Test
     void getAllByOwner() {
-        List<ItemResponseDtoForOwner> result = itemService.getAllByOwner(1L, 0, 10);
-        Assertions.assertEquals(result.size(), 2);
+        Long ownerId = 1L;
+        int numberOfItems = 2;
+        int pageSize = 10;
+        List<ItemResponseDtoForOwner> result = itemService.getAllByOwner(ownerId, 0, pageSize);
+        Assertions.assertEquals(numberOfItems, result.size());
+
+        Long firstItemId = 1L;
+        Long secondItemId = 2L;
+        pageSize = 1;
+        int firsPageNumber = 0;
+        int secondPageNumber = 1;
+        result = itemService.getAllByOwner(ownerId, firsPageNumber, pageSize);
+        Assertions.assertEquals(pageSize, result.size());
+        Assertions.assertEquals(firstItemId, result.get(0).getId());
+        result = itemService.getAllByOwner(ownerId, secondPageNumber, pageSize);
+        Assertions.assertEquals(secondItemId, result.get(0).getId());
+
+        int size = 1;
+        Long notExistsOwnerId = 100L;
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.getAllByOwner(notExistsOwnerId, firsPageNumber, size));
     }
 
     @Test
     void addComment() {
-        itemService.setBookingRepository(mockBookingRepository);
-        CommentRequestDto commentForAdd = CommentRequestDto.builder().text("Test text").item(1L).author(2L).build();
-        Booking booking = Booking.builder()
-                .id(1L)
-                .item(itemService.findById(1L))
-                .booker(userServiceImpl.findById(2L))
-                .start(Instant.parse("2020-09-10T10:10:10.00Z"))
-                .end(Instant.parse("2020-10-10T10:10:10.00Z"))
-                .build();
+        Long authorId = 4L;
+        String authorName = "User4";
+        Long itemId = 2L;
 
-        Mockito.when(mockBookingRepository.findAllByBookerIdAndItemIdAndEndIsBefore(Mockito.anyLong(),
-                        Mockito.anyLong(), Mockito.any(Instant.class)))
-                .thenReturn(List.of(booking));
-
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text("Text of comment").item(itemId)
+                .author(authorId).build();
         CommentResponseDto commentFromDB = itemService.addComment(commentForAdd);
-        Assertions.assertEquals("Test text", commentFromDB.getText());
+        Assertions.assertNull(commentForAdd.getId());
         Assertions.assertNotNull(commentFromDB.getId());
         Assertions.assertNotNull(commentFromDB.getCreated());
+        Assertions.assertEquals(commentForAdd.getText(), commentFromDB.getText());
+        Assertions.assertEquals(authorName, commentFromDB.getAuthorName());
+    }
 
-        CommentRequestDto commentWithEmptyText = CommentRequestDto.builder().text(" ").item(1L).author(2L).build();
-        Assertions.assertThrows(ValidationException.class, () -> itemService.addComment(commentWithEmptyText));
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithAuthorWhoNotBookedItemBefore() {
+        Long authorId = 3L;
+        Long itemId = 3L;
+        String textOfComment = "Text of comment";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ValidationException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWhenAuthorIsOwnerOfItem() {
+        Long authorId = 2L;
+        Long itemId = 3L;
+        String textOfComment = "Text of comment";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ValidationException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithNotExistsAuthorId() {
+        Long authorId = 100L;
+        Long itemId = 3L;
+        String textOfComment = "Text of comment";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithNullAuthorId() {
+        Long authorId = null;
+        Long itemId = 3L;
+        String textOfComment = "Text of comment";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithNotExistsItemId() {
+        Long authorId = 1L;
+        Long itemId = 100L;
+        String textOfComment = "Text of comment";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithNullItemId() {
+        Long authorId = 1L;
+        Long itemId = null;
+        String textOfComment = "Text of comment";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithNullText() {
+        Long authorId = 1L;
+        Long itemId = 3L;
+        String textOfComment = null;
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithEmptyText() {
+        Long authorId = 1L;
+        Long itemId = 3L;
+        String textOfComment = "";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSaveCommentWithBlankText() {
+        Long authorId = 1L;
+        Long itemId = 3L;
+        String textOfComment = " ";
+        CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
+                .author(authorId).build();
+        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
     }
 
     @Test
     void search() {
-        ItemRequestDto itemRequestDto1 = ItemRequestDto.builder().name("TestItemForSEARCH").description("Test description")
-                .owner(1L).available(true).build();
-        ItemRequestDto itemRequestDto2 = ItemRequestDto.builder().name("TestItem").description("Test description for search")
-                .owner(1L).available(true).build();
-        itemService.add(itemRequestDto1);
-        itemService.add(itemRequestDto2);
-        List<ItemResponseDto> result = itemService.search("earc", 0, 10);
-        Assertions.assertEquals(2, result.size());
+        String textForSearch = "search";
+        int pageSize = 10;
+        int firsPageNumber = 0;
+        int numberOfItemsSuitableForSearch = 3;
+        List<ItemResponseDto> result = itemService.search(textForSearch, firsPageNumber, pageSize);
+        Assertions.assertEquals(numberOfItemsSuitableForSearch, result.size());
+
+        String textForSearchWithDifferentCase = "SEArch";
+        result = itemService.search(textForSearchWithDifferentCase, firsPageNumber, pageSize);
+        Assertions.assertEquals(3, result.size());
+
+        pageSize = 1;
+        int secondPageNumber = 1;
+        result = itemService.search(textForSearch, secondPageNumber, pageSize);
+        Assertions.assertEquals(1, result.size());
+    }
+
+    @Test
+    void shouldReturnEmptyListIfTextForSearchIsNull() {
+        String textForSearch = null;
+        List<ItemResponseDto> result = itemService.search(textForSearch, 0, 10);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyListIfTextForSearchIsEmpty() {
+        String textForSearch = "";
+        List<ItemResponseDto> result = itemService.search(textForSearch, 0, 10);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyListIfTextForSearchIsBlank() {
+        String textForSearch = " ";
+        List<ItemResponseDto> result = itemService.search(textForSearch, 0, 10);
+        Assertions.assertTrue(result.isEmpty());
     }
 
     @Test
@@ -154,28 +364,32 @@ class ItemServiceImplTest {
 
     @Test
     void checkIsItemInStorage() {
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.checkIsItemInStorage(100L));
-        Assertions.assertDoesNotThrow(() -> itemService.checkIsItemInStorage(1L));
+        Long existsItemId = 1L;
+        Long notExistsItemId = 100L;
+        Assertions.assertDoesNotThrow(() -> itemService.checkIsItemInStorage(existsItemId));
+        Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.checkIsItemInStorage(notExistsItemId));
     }
 
     @Test
     void checkIsItemAvailable() {
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder().name("TestItem").description("Test description")
-                .owner(1L).available(true).build();
-        ItemResponseDto itemResponseDto = itemService.add(itemRequestDto);
-        Assertions.assertDoesNotThrow(() -> itemService.checkIsItemAvailable(itemResponseDto.getId()));
-        itemRequestDto.setId(itemResponseDto.getId());
-        itemRequestDto.setAvailable(false);
-        ItemResponseDto updatedItemResponseDto = itemService.update(itemRequestDto);
+        Long availableItemId = 1L;
+        Long unAvailableItemId = 2L;
+        Assertions.assertDoesNotThrow(() -> itemService.checkIsItemAvailable(availableItemId));
         Assertions.assertThrows(ValidationException.class,
-                () -> itemService.checkIsItemAvailable(updatedItemResponseDto.getId()));
+                () -> itemService.checkIsItemAvailable(unAvailableItemId));
     }
 
     @Test
     void findById() {
-        Item result = itemService.findById(1L);
+        Long existsItemId = 1L;
+        Item result = itemService.findById(existsItemId);
         Assertions.assertEquals("Item1", result.getName());
         Assertions.assertEquals("Description1", result.getDescription());
         Assertions.assertEquals(1L, result.getOwner());
+
+        Long notExistsItemId = 100L;
+        Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.findById(notExistsItemId));
     }
 }

@@ -60,19 +60,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String delete(Long userId) {
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
-            log.info(String.format("Пользователь id=%s успешно удален", userId));
-            return String.format("Пользователь id=%s успешно удален", userId);
-        } else {
-            log.warn(String.format("Пользователь id=%s не найден.", userId));
-            throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
-        }
+        checkIsObjectInStorage(userId);
+        userRepository.deleteById(userId);
+        log.info(String.format("Пользователь id=%s успешно удален", userId));
+        return String.format("Пользователь id=%s успешно удален", userId);
     }
 
     @Override
     public void checkIsObjectInStorage(Long userId) {
-        if (!userRepository.existsById(userId)) {
+        if (!(userId != null && userRepository.existsById(userId))) {
             log.warn(String.format("Пользователь id=%s не найден.", userId));
             throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
         }
@@ -80,6 +76,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long userId) {
+        if(userId == null){
+            log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
+            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
+        }
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();

@@ -21,6 +21,10 @@ import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,8 +43,8 @@ public class BookingServiceImpl implements BookingService {
         userServiceImpl.checkIsObjectInStorage(bookingRequestDto.getBookerId());
         itemServiceImpl.checkIsItemInStorage(bookingRequestDto.getItemId());
         itemServiceImpl.checkIsItemAvailable(bookingRequestDto.getItemId());
+        checkBookingTime(bookingRequestDto);
         Booking booking = bookingMapper.requestDtoToEntity(bookingRequestDto);
-        checkBookingTime(booking);
         checkIsItemCanBeBooked(booking.getItem().getId(), booking.getStart(), booking.getEnd());
         if (checkIsUserOwnerOfItem(booking.getBooker().getId(), booking.getItem().getId())) {
             log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.",
@@ -68,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
         if (userId.equals(itemServiceImpl.findById(bookingForUpdate.getItem().getId()).getOwner())) {
             bookingForUpdate.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         }
-        if (userId.equals(bookingForUpdate.getBooker())) {
+        if (userId.equals(bookingForUpdate.getBooker().getId())) {
             bookingForUpdate.setStatus(isApproved ? BookingStatus.WAITING : BookingStatus.CANCELED);
         }
         Booking updatedBooking = bookingRepository.save(bookingForUpdate);
@@ -117,8 +121,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             }
             case WAITING: {
-                result = bookingRepository.findAllByBookerIdAndStatus(pageable, userId,
-                        BookingStatus.WAITING);
+                result = bookingRepository.findAllByBookerIdAndStatus(pageable, userId, BookingStatus.WAITING);
                 break;
             }
             case REJECTED: {
@@ -145,7 +148,8 @@ public class BookingServiceImpl implements BookingService {
                 break;
             }
             case CURRENT: {
-                result = bookingRepository.findAllByItemOwnerAndStartLessThanAndEndGreaterThan(pageable, userId, Instant.now(), Instant.now());
+                result = bookingRepository.findAllByItemOwnerAndStartLessThanAndEndGreaterThan(pageable, userId,
+                        Instant.now(), Instant.now());
                 break;
             }
             case FUTURE: {
@@ -191,21 +195,27 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkBookingTime(Booking booking) {
-        if (booking.getStart().isBefore(Instant.now())) {
-            log.warn(String.format("Некорректное время начала бронирования объекта id=%s.", booking.getBooker()));
-            throw new ValidationException(String.format("Некорректное время начала бронирования объекта id=%s.",
-                    booking.getBooker()));
+    private void checkBookingTime(BookingRequestDto booking) {
+        if (booking == null || booking.getStart() == null || booking.getEnd() == null) {
+            log.warn("Некорректное время начала бронирования объекта.");
+            throw new ValidationException("Некорректное время начала бронирования объекта.");
         }
-        if (booking.getEnd().isBefore(booking.getStart())) {
-            log.warn(String.format("Некорректное время окончания бронирования объекта id=%s.", booking.getBooker()));
+        Instant start = stringToInstant(booking.getStart());
+        Instant end = stringToInstant(booking.getEnd());
+        if (start.isBefore(Instant.now())) {
+            log.warn(String.format("Некорректное время начала бронирования объекта id=%s.", booking.getItemId()));
+            throw new ValidationException(String.format("Некорректное время начала бронирования объекта id=%s.",
+                    booking.getItemId()));
+        }
+        if (end.isBefore(start) || end.equals(start)) {
+            log.warn(String.format("Некорректное время окончания бронирования объекта id=%s.", booking.getItemId()));
             throw new ValidationException(String.format("Некорректное время окончания бронирования объекта id=%s.",
-                    booking.getBooker()));
+                    booking.getItemId()));
         }
     }
 
     private void checkIsBookingInStorage(Long bookingId) {
-        if (!bookingRepository.existsById(bookingId)) {
+        if (!(bookingId != null && bookingRepository.existsById(bookingId))) {
             log.warn(String.format("Бронирование id=%s не найдено.", bookingId));
             throw new ObjectNotFoundException(String.format("Бронирование id=%s не найдено.", bookingId));
         }
@@ -242,5 +252,11 @@ public class BookingServiceImpl implements BookingService {
             throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  для пользователя " +
                     "id=%s.", userId));
         }
+    }
+
+    private Instant stringToInstant(String stringTime) {
+        LocalDateTime localDateTime = LocalDateTime.parse(stringTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
+        return zonedDateTime.toInstant();
     }
 }

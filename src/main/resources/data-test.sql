@@ -1,11 +1,3 @@
--- DELETE
--- FROM items
--- where id > 6;
---
--- DELETE
--- FROM users
--- where id > 3;
-
 INSERT INTO users(NAME, EMAIL)
 VALUES ('User1', 'User1@email.com'),
        ('User2', 'User2@email.com'),
@@ -13,23 +5,34 @@ VALUES ('User1', 'User1@email.com'),
        ('User4', 'User4@email.com');
 
 INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item1', 'Description1', true, 1);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item11', 'Description11', false, 1);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item2', 'Description2', true, 2);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item22', 'Description22', true, 2);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item3', 'Description3', true, 3);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item33', 'Description33', true, 3);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item4', 'Description4', true, 4);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item44', 'Description44', true, 4);
---
--- INSERT INTO bookings(start_date, end_date, item_id, booker_id, status)
--- VALUES ('2021-09-09 09:00:00', '2021-10-09 09:00:00', 3, 3, 'approved');
--- INSERT INTO bookings(start_date, end_date, item_id, booker_id, status)
--- VALUES ('2023-01-09 09:00:00', '2023-02-09 09:00:00', 3, 3, 'waiting');
+VALUES ('Item1', 'Description1', true, 1),
+       ('Item11', 'Description11 for search', false, 1),
+       ('Item2', 'Description2', true, 2),
+       ('Item22', 'Description22 for SEARCH', true, 2),
+       ('Item3', 'Description3', true, 3),
+       ('Item33', 'Description33 for SeaRcH', true, 3),
+       ('Item4 forsearch', 'Description4', true, 4),
+       ('Item44', 'Description44', true, 4);
+
+INSERT INTO bookings(start_date, end_date, item_id, booker_id, status)
+VALUES ('2021-01-09T10:10:10', '2021-06-01T10:10:10', 3, 1, 0),
+       ('2021-07-01T10:10:10', '2021-12-01T10:10:10', 1, 2, 0),
+       ('2022-01-01T10:10:10', '2022-12-30T10:10:10', 3, 1, 0),
+       ('2022-01-01T10:10:10', '2022-12-30T10:10:10', 1, 2, 0),
+       ('2023-01-01T10:10:10', '2023-06-01T10:10:10', 3, 1, 2),
+       ('2023-07-01T10:10:10', '2023-12-01T10:10:10', 1, 2, 2),
+       ('2021-01-09T10:10:10', '2021-06-01T10:10:10', 3, 1, 2),
+       ('2021-01-01T10:10:10', '2021-12-01T10:10:10', 2, 4, 1);
+
+INSERT INTO requests(description, requestor_id, created)
+VALUES ('Request1 description', 1, '2022-01-01T10:10:10'),
+       ('Request2 description', 1, '2022-02-01T10:10:10'),
+       ('Request3 description', 1, '2022-03-01T10:10:10'),
+       ('Request4 description', 2, '2022-04-01T10:10:10'),
+       ('Request5 description', 2, '2022-05-01T10:10:10');
+
+INSERT INTO comments(comment_text, item_id, author_id, created)
+VALUES ('Comment text1', 1, 2, '2022-01-01T10:10:10'),
+       ('Comment text2', 1, 2, '2022-02-01T10:10:10'),
+       ('Comment text3', 3, 3, '2022-01-01T10:10:10'),
+       ('Comment text4', 3, 3, '2022-02-01T10:10:10');

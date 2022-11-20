@@ -15,7 +15,7 @@ public interface ItemService {
 
     List<ItemResponseDtoForOwner> getAllByOwner(Long userId, int from, int size);
 
-    CommentResponseDto addComment(CommentRequestDto commentRequestDto);
+    CommentResponseDto addComment(@Valid CommentRequestDto commentRequestDto);
 
     List<ItemResponseDto> search(String text, int from, int size);
 

@@ -33,16 +33,10 @@ public class ItemRequestServiceImpl {
 
     public OutputItemRequestDto add(InputItemRequestDto inputItemRequestDto) {
         userService.checkIsObjectInStorage(inputItemRequestDto.getRequestor());
-        System.out.println("1");
         ItemRequest itemRequest = itemRequestMapper.inputItemRequestDtoToEntity(inputItemRequestDto);
-        System.out.println("2");
         itemRequest.setCreated(Instant.now());
-        System.out.println("3");
         ItemRequest createdItemRequest = itemRequestRepository.save(itemRequest);
-        System.out.println("4");
-        System.out.println(createdItemRequest);
         OutputItemRequestDto outputItemRequestDto = itemRequestMapper.entityToOutputItemRequestDto(createdItemRequest);
-        System.out.println("5");
         log.info(String.format("Запрос id=%s успешно создан", createdItemRequest.getId()));
         return outputItemRequestDto;
     }
@@ -94,7 +88,7 @@ public class ItemRequestServiceImpl {
     }
 
     private void checkIsObjectInStorage(Long requestId) {
-        if (!itemRequestRepository.existsById(requestId)) {
+        if (!(requestId != null && itemRequestRepository.existsById(requestId))) {
             log.warn(String.format("Заявка Id=%s не найдена", requestId));
             throw new ObjectNotFoundException(String.format("Заявка Id=%s не найдена", requestId));
         }

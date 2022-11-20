@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -12,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -32,12 +31,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 @AllArgsConstructor
-@Getter
-@Setter
 @Validated
 public class ItemServiceImpl implements ItemService {
     private ItemRepository itemRepository;
@@ -115,18 +111,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
+    public CommentResponseDto addComment(@Valid CommentRequestDto commentRequestDto) {
         userServiceImpl.checkIsObjectInStorage(commentRequestDto.getAuthor());
         checkIsItemInStorage(commentRequestDto.getItem());
-        if (commentRequestDto.getText().isBlank()) {
-            log.warn("Текст комментария не корректный");
-            throw new ValidationException("Текст комментария не корректный");
-        }
         if (checkIsUserCanMakeComment(commentRequestDto.getAuthor(), commentRequestDto.getItem())) {
             Comment comment = commentMapper.toEntity(commentRequestDto);
             comment.setCreated(Instant.now());
             Comment savedComment = commentRepository.save(comment);
-            return commentMapper.toCommentResponseDto(savedComment);
+            CommentResponseDto result = commentMapper.toCommentResponseDto(savedComment);
+            log.info(String.format("Комментарий Id=%s на объект ItemId=%s успешно добавлен  пользователем UserId=%s",
+                    savedComment.getId(), savedComment.getItem(), commentRequestDto.getAuthor()));
+            return result;
         } else {
             log.warn(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
             throw new ValidationException(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
@@ -157,7 +152,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void checkIsItemInStorage(Long itemId) {
-        if (!itemRepository.existsById(itemId)) {
+        if (!(itemId != null && itemRepository.existsById(itemId))) {
             log.warn(String.format("Объект itemId=%s не найден", itemId));
             throw new ObjectNotFoundException(String.format("Объект itemId=%s не найден", itemId));
         }
@@ -178,7 +173,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Boolean checkIsUserCanMakeComment(Long userId, Long itemId) {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndItemIdAndEndIsBefore(userId, itemId, Instant.now());
+        if (findById(itemId).getOwner().equals(itemId)) {
+            return false;
+        }
+        List<Booking> result = bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatus(userId, itemId,
+                Instant.now(), BookingStatus.APPROVED);
         return !result.isEmpty();
     }
 
