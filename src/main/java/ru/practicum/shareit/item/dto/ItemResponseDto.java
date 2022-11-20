@@ -16,7 +16,6 @@ public class ItemResponseDto implements ResponseDto {
     private String name;
     private String description;
     private Boolean available;
-    private Long request;
     private BookingItemDto lastBooking;
     private BookingItemDto nextBooking;
     private List<CommentResponseDto> comments;
