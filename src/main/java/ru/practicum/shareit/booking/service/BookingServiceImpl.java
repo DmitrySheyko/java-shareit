@@ -14,7 +14,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
-//import ru.practicum.shareit.exceptions.UnsupportedStatusException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
@@ -69,9 +68,6 @@ public class BookingServiceImpl implements BookingService {
         }
         if (userId.equals(itemServiceImpl.findById(bookingForUpdate.getItem().getId()).getOwner())) {
             bookingForUpdate.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        }
-        if (userId.equals(bookingForUpdate.getBooker().getId())) {
-            bookingForUpdate.setStatus(isApproved ? BookingStatus.WAITING : BookingStatus.CANCELED);
         }
         Booking updatedBooking = bookingRepository.save(bookingForUpdate);
         BookingResponseDto bookingResponseDto = bookingMapper.entityToResponseDto(updatedBooking);

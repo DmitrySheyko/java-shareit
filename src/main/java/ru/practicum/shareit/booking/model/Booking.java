@@ -43,22 +43,11 @@ public class Booking {
 
         Booking booking = (Booking) o;
 
-        if (!id.equals(booking.id)) return false;
-        if (!start.equals(booking.start)) return false;
-        if (!end.equals(booking.end)) return false;
-        if (!item.equals(booking.item)) return false;
-        if (!booker.equals(booking.booker)) return false;
-        return status == booking.status;
+        return id.equals(booking.id);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + start.hashCode();
-        result = 31 * result + end.hashCode();
-        result = 31 * result + item.hashCode();
-        result = 31 * result + booker.hashCode();
-        result = 31 * result + status.hashCode();
-        return result;
+        return id.hashCode();
     }
 }

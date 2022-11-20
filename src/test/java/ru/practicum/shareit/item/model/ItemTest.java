@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 class ItemTest {
     Item item1 = Item.builder().id(1L).name("Name 1").description("Description 1").owner(1L).available(true)
             .requestId(1L).build();
-    Item item2 = Item.builder().id(2L).name("Name 1").description("Description 1").owner(1L).available(true)
-            .requestId(1L).build();
+    Item item2 = new Item(2L, "Name 1", "Description 1", true, 1L, 1L);
     Item item3 = item1;
 
     @Test

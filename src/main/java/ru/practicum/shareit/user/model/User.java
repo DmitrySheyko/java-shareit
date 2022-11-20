@@ -5,7 +5,6 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @Getter
 @Builder
@@ -33,16 +32,11 @@ public class User {
 
         User user = (User) o;
 
-        if (!id.equals(user.id)) return false;
-        if (!Objects.equals(name, user.name)) return false;
-        return email.equals(user.email);
+        return id.equals(user.id);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + email.hashCode();
-        return result;
+        return id.hashCode();
     }
 }

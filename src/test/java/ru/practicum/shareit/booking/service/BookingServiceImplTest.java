@@ -51,7 +51,7 @@ class BookingServiceImplTest {
         Long ownerOfItem = 1L;
         BookingRequestDto bookingFromOwner = BookingRequestDto.builder().bookerId(ownerOfItem).start(start).end(end)
                 .itemId(itemId).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, ()->bookingService.add(bookingFromOwner));
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService.add(bookingFromOwner));
     }
 
     @Test
@@ -128,6 +128,16 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenAddBookingWithStartErualsEnd() {
+        start = "2023-08-11T10:10:10";
+        end = "2023-08-11T10:10:10";
+        BookingRequestDto bookingRequestDtoWithEndBeforeStart = BookingRequestDto.builder()
+                .bookerId(bookerId).start(start).end(end).itemId(itemId).build();
+        Assertions.assertThrows(ValidationException.class,
+                () -> bookingService.add(bookingRequestDtoWithEndBeforeStart));
+    }
+
+    @Test
     void update() {
         BookingRequestDto requestDtoForAdd = BookingRequestDto.builder().bookerId(bookerId).start(start).end(end)
                 .itemId(itemId).build();
@@ -136,6 +146,17 @@ class BookingServiceImplTest {
         Assertions.assertEquals(BookingStatus.REJECTED, resultOfUpdate.getStatus());
         resultOfUpdate = bookingService.update(itemOwnerId, resultOfAdding.getId(), true);
         Assertions.assertEquals(BookingStatus.APPROVED, resultOfUpdate.getStatus());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenOwnerTryToRejectApprovedBooking() {
+        BookingRequestDto requestDtoForAdd = BookingRequestDto.builder().bookerId(bookerId).start(start).end(end)
+                .itemId(itemId).build();
+        BookingResponseDto resultOfAdding = bookingService.add(requestDtoForAdd);
+        BookingResponseDto resultOfUpdate = bookingService.update(itemOwnerId, resultOfAdding.getId(), true);
+        Assertions.assertEquals(BookingStatus.APPROVED, resultOfUpdate.getStatus());
+        Assertions.assertThrows(ValidationException.class, () -> bookingService.update(itemOwnerId,
+                resultOfAdding.getId(), false));
     }
 
     @Test
@@ -159,7 +180,7 @@ class BookingServiceImplTest {
         Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService.getById(nullUser,
                 resultOfAdding.getId()));
 
-        Long notExistsUser = null;
+        Long notExistsUser = 100L;
         Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService.getById(notExistsUser,
                 resultOfAdding.getId()));
 
@@ -183,11 +204,14 @@ class BookingServiceImplTest {
                 RequestState.WAITING.toString(), from, size);
         List<BookingResponseDto> rejectedBookings = bookingService.getAllBookingsByBookerId(bookerId,
                 RequestState.REJECTED.toString(), from, size);
+        List<BookingResponseDto> currentBookings = bookingService.getAllBookingsByBookerId(bookerId,
+                RequestState.CURRENT.toString(), from, size);
         Assertions.assertEquals(4, allBookings.size());
         Assertions.assertEquals(2, pastBookings.size());
         Assertions.assertEquals(1, futureBookings.size());
         Assertions.assertEquals(2, waitingBookings.size());
         Assertions.assertEquals(2, rejectedBookings.size());
+        Assertions.assertEquals(1, currentBookings.size());
 
         Long nullBookerId = null;
         Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService
@@ -217,11 +241,14 @@ class BookingServiceImplTest {
                 RequestState.WAITING.toString(), from, size);
         List<BookingResponseDto> rejectedBookings = bookingService.getAllBookingsByOwnerItems(itemOwnerId,
                 RequestState.REJECTED.toString(), from, size);
+        List<BookingResponseDto> currentBookings = bookingService.getAllBookingsByOwnerItems(itemOwnerId,
+                RequestState.CURRENT.toString(), from, size);
         Assertions.assertEquals(4, allBookings.size());
         Assertions.assertEquals(2, pastBookings.size());
         Assertions.assertEquals(1, futureBookings.size());
         Assertions.assertEquals(2, waitingBookings.size());
         Assertions.assertEquals(1, rejectedBookings.size());
+        Assertions.assertEquals(1, currentBookings.size());
 
         Long nullBookerId = null;
         Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService

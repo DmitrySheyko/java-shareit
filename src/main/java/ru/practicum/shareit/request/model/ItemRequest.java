@@ -39,18 +39,11 @@ public class ItemRequest {
 
         ItemRequest that = (ItemRequest) o;
 
-        if (!id.equals(that.id)) return false;
-        if (!description.equals(that.description)) return false;
-        if (!requestor.equals(that.requestor)) return false;
-        return created.equals(that.created);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + description.hashCode();
-        result = 31 * result + requestor.hashCode();
-        result = 31 * result + created.hashCode();
-        return result;
+        return id.hashCode();
     }
 }

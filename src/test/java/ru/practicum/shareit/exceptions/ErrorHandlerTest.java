@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.validation.ConstraintViolationException;
-
 import java.util.Collections;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ErrorHandlerTest {
-final ErrorHandler errorHandler;
+    final ErrorHandler errorHandler;
+
     @Test
     void handlerOfValidationException() {
         Error error = errorHandler.handlerOfValidationException(new ValidationException("message"));
@@ -32,7 +32,6 @@ final ErrorHandler errorHandler;
         Error error = errorHandler.handlerOfObjectNotFoundException(new ObjectNotFoundException("message"));
         Assertions.assertEquals(error.getError(), "message");
     }
-
 
     @Test
     void handlerExceptions() {

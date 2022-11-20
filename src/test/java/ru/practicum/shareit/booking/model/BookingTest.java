@@ -14,9 +14,8 @@ class BookingTest {
     Booking booking1 = Booking.builder().id(1L).item(item).booker(user)
             .start(Instant.parse("2020-10-10T10:10:10.00Z")).end(Instant.parse("2020-11-10T10:10:10.00Z"))
             .status(BookingStatus.WAITING).build();
-    Booking booking2 = Booking.builder().id(2L).item(item).booker(user)
-            .start(Instant.parse("2021-10-10T10:10:10.00Z")).end(Instant.parse("2021-11-10T10:10:10.00Z"))
-            .status(BookingStatus.WAITING).build();
+    Booking booking2 = new Booking(2L, Instant.parse("2021-10-10T10:10:10.00Z"),
+            Instant.parse("2021-11-10T10:10:10.00Z"), item, user, BookingStatus.WAITING);
     Booking booking3 = booking1;
 
     @Test

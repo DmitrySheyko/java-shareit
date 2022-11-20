@@ -7,7 +7,7 @@ import java.time.Instant;
 
 class CommentTest {
     Comment comment1 = Comment.builder().id(1L).text("Text").author(2L).created(Instant.now()).item(3L).build();
-    Comment comment2 = Comment.builder().id(2L).text("Text").author(2L).created(Instant.now()).item(3L).build();
+    Comment comment2 = new Comment(2L, "Text", 3L, 2L, Instant.now());
     Comment comment3 = comment1;
 
     @Test

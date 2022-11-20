@@ -13,8 +13,8 @@ class ItemRequestTest {
             .requestId(1L).build();
     ItemRequest itemRequest1 = ItemRequest.builder().id(1L).description("Description").requestor(2L)
             .created(Instant.now()).answersList(List.of(item)).build();
-    ItemRequest itemRequest2 = ItemRequest.builder().id(2L).description("Description").requestor(2L)
-            .created(Instant.now()).answersList(Collections.emptyList()).build();
+    ItemRequest itemRequest2 = new ItemRequest(2L, "Description", 2L, Instant.now(),
+            Collections.emptyList());
     ItemRequest itemRequest3 = itemRequest1;
 
     @Test
