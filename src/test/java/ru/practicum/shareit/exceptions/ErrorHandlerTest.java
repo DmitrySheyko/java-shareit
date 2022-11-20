@@ -13,7 +13,8 @@ import java.util.Collections;
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ErrorHandlerTest {
-final ErrorHandler errorHandler;
+    final ErrorHandler errorHandler;
+
     @Test
     void handlerOfValidationException() {
         Error error = errorHandler.handlerOfValidationException(new ValidationException("message"));
@@ -32,7 +33,6 @@ final ErrorHandler errorHandler;
         Error error = errorHandler.handlerOfObjectNotFoundException(new ObjectNotFoundException("message"));
         Assertions.assertEquals(error.getError(), "message");
     }
-
 
     @Test
     void handlerExceptions() {

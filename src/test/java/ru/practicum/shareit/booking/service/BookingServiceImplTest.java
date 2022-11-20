@@ -51,7 +51,7 @@ class BookingServiceImplTest {
         Long ownerOfItem = 1L;
         BookingRequestDto bookingFromOwner = BookingRequestDto.builder().bookerId(ownerOfItem).start(start).end(end)
                 .itemId(itemId).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, ()->bookingService.add(bookingFromOwner));
+        Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService.add(bookingFromOwner));
     }
 
     @Test
