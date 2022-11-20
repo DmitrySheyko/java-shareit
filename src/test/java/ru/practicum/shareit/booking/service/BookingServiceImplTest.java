@@ -121,9 +121,9 @@ class BookingServiceImplTest {
 
     @Test
     void update() {
-        BookingRequestDto RequestDtoForAdd = BookingRequestDto.builder().bookerId(bookerId).start(start).end(end)
+        BookingRequestDto requestDtoForAdd = BookingRequestDto.builder().bookerId(bookerId).start(start).end(end)
                 .itemId(itemId).build();
-        BookingResponseDto resultOfAdding = bookingService.add(RequestDtoForAdd);
+        BookingResponseDto resultOfAdding = bookingService.add(requestDtoForAdd);
         BookingResponseDto resultOfUpdate = bookingService.update(itemOwnerId, resultOfAdding.getId(), false);
         Assertions.assertEquals(BookingStatus.REJECTED, resultOfUpdate.getStatus());
         resultOfUpdate = bookingService.update(itemOwnerId, resultOfAdding.getId(), true);
@@ -132,9 +132,9 @@ class BookingServiceImplTest {
 
     @Test
     void getById() {
-        BookingRequestDto RequestDtoForAdd = BookingRequestDto.builder().bookerId(bookerId).start(start).end(end)
+        BookingRequestDto requestDtoForAdd = BookingRequestDto.builder().bookerId(bookerId).start(start).end(end)
                 .itemId(itemId).build();
-        BookingResponseDto resultOfAdding = bookingService.add(RequestDtoForAdd);
+        BookingResponseDto resultOfAdding = bookingService.add(requestDtoForAdd);
         BookingResponseDto resultOfRequestFromItemOwner = bookingService.getById(itemOwnerId,
                 resultOfAdding.getId());
         Assertions.assertEquals(resultOfAdding.getId(), resultOfRequestFromItemOwner.getId());

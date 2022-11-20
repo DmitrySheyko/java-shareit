@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long userId) {
-        if(userId == null){
+        if (userId == null) {
             log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
             throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
         }

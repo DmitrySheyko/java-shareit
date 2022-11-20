@@ -5,12 +5,8 @@ import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Getter
 @Setter
 @Builder
@@ -33,7 +29,7 @@ public class ItemRequest {
     private Instant created;
 
     @OneToMany
-    @JoinColumn(name="request_id", referencedColumnName="id")
+    @JoinColumn(name = "request_id", referencedColumnName = "id")
     private List<Item> answersList;
 
     @Override
