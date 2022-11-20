@@ -11,7 +11,7 @@ import javax.validation.Valid;
 @Validated
 public class UserMapper {
 
-    public UserDto toDtoForOtherUsers(User user) {
+    public UserDto toUserDto(User user) {
         if (user == null) {
             return null;
         }
@@ -23,7 +23,7 @@ public class UserMapper {
     }
 
     @Valid
-    public User dtoForOtherUsersToEntity(UserDto userDto) {
+    public User userDtoToEntity(UserDto userDto) {
         if (userDto == null) {
             return null;
         }

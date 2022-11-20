@@ -13,49 +13,31 @@ public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ValidationException.class)
-    public String handlerOfValidationException(final ValidationException e) {
-        return e.getMessage();
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UnsupportedStatusException.class)
-    public Error handlerOfUnsupportedStatusException(final UnsupportedStatusException e) {
+    public Error handlerOfValidationException(final ValidationException e) {
         return new Error(e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public Error handlerOfIllegalArgumentException(final IllegalArgumentException e) {
-        return new Error("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handlerOfConstraintValidationException(final ConstraintViolationException e) {
-        return String.format("Ошибка. %s", e.getMessage());
+    public Error handlerOfConstraintValidationException(final ConstraintViolationException e) {
+        return new Error(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ObjectNotFoundException.class)
-    public String handlerOfObjectNotFoundException(final ObjectNotFoundException e) {
-        return String.format("Ошибка. %s", e.getMessage());
-    }
-
-    @ExceptionHandler(ConflictErrorException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handlerOfConflictErrorException(final ConflictErrorException e) {
-        return String.format("Ошибка. %s", e.getMessage());
+    public Error handlerOfObjectNotFoundException(final ObjectNotFoundException e) {
+        return new Error(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handlerOfMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        return String.format("Ошибка. %s", e.getMessage());
+    public Error handlerOfMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        return new Error(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handlerExceptions(final Exception e) {
-        return String.format("Ошибка. %s", e.getMessage());
+    public Error handlerExceptions(final Exception e) {
+        return new Error(e.getMessage());
     }
 }

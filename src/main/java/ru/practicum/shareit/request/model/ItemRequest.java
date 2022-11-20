@@ -53,15 +53,4 @@ public class ItemRequest {
         result = 31 * result + created.hashCode();
         return result;
     }
-
-    @Override
-    public String toString() {
-        return "ItemRequest{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", requestor=" + requestor +
-                ", created=" + created +
-                ", answersList=" + answersList +
-                '}';
-    }
 }

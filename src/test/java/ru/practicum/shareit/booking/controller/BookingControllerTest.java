@@ -142,9 +142,9 @@ class BookingControllerTest {
         BookingResponseDto responseDtoForGetAllByOwner2 = BookingResponseDto.builder().id(1L).build();
         List<BookingResponseDto> result = List.of(responseDtoForGetAllByOwner, responseDtoForGetAllByOwner2);
 
-        when(bookingService.getAllBookingsByBookerId(1L, "ALL", 0, 10)).thenReturn(result);
+        when(bookingService.getAllBookingsByOwnerItems(1L, "ALL", 0, 10)).thenReturn(result);
 
-        mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings/owner")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .header("X-Sharer-User-Id", 1)
                         .param("state", "ALL")
@@ -155,9 +155,9 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)));
 
-        when(bookingService.getAllBookingsByBookerId(1L, "ALL", 0, 10)).thenReturn(result);
+        when(bookingService.getAllBookingsByOwnerItems(1L, "ALL", 0, 10)).thenReturn(result);
 
-        mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings/owner")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .header("X-Sharer-User-Id", 1)
                         .param("state", "ALL")
@@ -166,9 +166,9 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)));
 
-        when(bookingService.getAllBookingsByBookerId(1L, "ALL", 0, 10)).thenReturn(result);
+        when(bookingService.getAllBookingsByOwnerItems(1L, "ALL", 0, 10)).thenReturn(result);
 
-        mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings/owner")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .header("X-Sharer-User-Id", 1)
                         .param("state", "ALL")

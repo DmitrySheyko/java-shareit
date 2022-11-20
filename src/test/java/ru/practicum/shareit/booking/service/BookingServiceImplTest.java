@@ -47,6 +47,14 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenAddBookingOwnerOfItem() {
+        Long ownerOfItem = 1L;
+        BookingRequestDto bookingFromOwner = BookingRequestDto.builder().bookerId(ownerOfItem).start(start).end(end)
+                .itemId(itemId).build();
+        Assertions.assertThrows(ObjectNotFoundException.class, ()->bookingService.add(bookingFromOwner));
+    }
+
+    @Test
     void shouldThrowExceptionWhenAddBookingWithNotExistsBooker() {
         Long notExistsBookerId = 100L;
         BookingRequestDto bookingRequestDtoWithNotExistsBookerId = BookingRequestDto.builder()
@@ -188,6 +196,10 @@ class BookingServiceImplTest {
         Long notExistsBookerId = null;
         Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService
                 .getAllBookingsByBookerId(notExistsBookerId, RequestState.ALL.toString(), from, size));
+
+        String incorrectBookingStatus = "INCORRECT";
+        Assertions.assertThrows(ValidationException.class, () -> bookingService
+                .getAllBookingsByBookerId(bookerId, incorrectBookingStatus, from, size));
     }
 
     @Test
@@ -218,5 +230,9 @@ class BookingServiceImplTest {
         Long notExistsBookerId = null;
         Assertions.assertThrows(ObjectNotFoundException.class, () -> bookingService
                 .getAllBookingsByOwnerItems(notExistsBookerId, RequestState.ALL.toString(), from, size));
+
+        String incorrectBookingStatus = "INCORRECT";
+        Assertions.assertThrows(ValidationException.class, () -> bookingService
+                .getAllBookingsByOwnerItems(itemOwnerId, incorrectBookingStatus, from, size));
     }
 }

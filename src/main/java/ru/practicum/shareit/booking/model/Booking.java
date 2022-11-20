@@ -19,11 +19,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Future(message = "Некоректная дата начала бронирования")
     @Column(name = "start_date", nullable = false)
     private Instant start;
 
-//    @Future(message = "Некоректная дата окончания бронирования")
     @Column(name = "end_date", nullable = false)
     private Instant end;
 

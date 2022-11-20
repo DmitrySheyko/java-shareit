@@ -14,7 +14,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
-import ru.practicum.shareit.exceptions.UnsupportedStatusException;
+//import ru.practicum.shareit.exceptions.UnsupportedStatusException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
@@ -47,10 +47,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.requestDtoToEntity(bookingRequestDto);
         checkIsItemCanBeBooked(booking.getItem().getId(), booking.getStart(), booking.getEnd());
         if (checkIsUserOwnerOfItem(booking.getBooker().getId(), booking.getItem().getId())) {
-            log.warn(String.format("Данные о бронировании не доступны  для пользователя id=%s.",
-                    bookingRequestDto.getBookerId()));
-            throw new ObjectNotFoundException(String.format("Данные о бронировании не доступны  " +
-                    "для пользователя id=%s.", bookingRequestDto.getBookerId()));
+            log.warn("Бронирование своих вещей не доступно.");
+            throw new ObjectNotFoundException("Бронирование своих вещей не доступно.");
         }
         booking.setStatus(BookingStatus.WAITING);
         Booking savedBooking = bookingRepository.save(booking);
@@ -99,10 +97,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getAllBookingsByBookerId(Long userId, String state, int from, int size) {
         userServiceImpl.checkIsObjectInStorage(userId);
+        RequestState stateForSearch = checkStateForSearch(state);
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
         Page<Booking> result;
-        switch (RequestState.valueOf(state)) {
+        switch (stateForSearch) {
             case ALL: {
                 result = bookingRepository.findAllByBookerId(pageable, userId);
                 break;
@@ -130,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
             }
             default: {
                 log.warn("Unknown state: UNSUPPORTED_STATUS");
-                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
             }
         }
         return result.stream().map(bookingMapper::entityToResponseDto).collect(Collectors.toList());
@@ -139,10 +138,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingResponseDto> getAllBookingsByOwnerItems(Long userId, String state, int from, int size) {
         userServiceImpl.checkIsObjectInStorage(userId);
+        RequestState stateForSearch = checkStateForSearch(state);
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
         Page<Booking> result;
-        switch (RequestState.valueOf(state)) {
+        switch (stateForSearch) {
             case ALL: {
                 result = bookingRepository.findAllByItemOwner(pageable, userId);
                 break;
@@ -170,7 +170,7 @@ public class BookingServiceImpl implements BookingService {
             }
             default: {
                 log.warn("Unknown state: UNSUPPORTED_STATUS");
-                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
             }
         }
         return result.stream().map(bookingMapper::entityToResponseDto).collect(Collectors.toList());
@@ -258,5 +258,15 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime localDateTime = LocalDateTime.parse(stringTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
         return zonedDateTime.toInstant();
+    }
+
+    private RequestState checkStateForSearch(String state) {
+        RequestState stateForSearch;
+        try {
+            stateForSearch = RequestState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
+        return stateForSearch;
     }
 }

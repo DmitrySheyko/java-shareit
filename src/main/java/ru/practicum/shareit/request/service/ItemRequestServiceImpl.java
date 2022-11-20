@@ -26,11 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ItemRequestServiceImpl {
+public class ItemRequestServiceImpl implements ItemRequestService {
     ItemRequestRepository itemRequestRepository;
     ItemRequestMapper itemRequestMapper;
     UserServiceImpl userService;
 
+    @Override
     public OutputItemRequestDto add(InputItemRequestDto inputItemRequestDto) {
         userService.checkIsObjectInStorage(inputItemRequestDto.getRequestor());
         ItemRequest itemRequest = itemRequestMapper.inputItemRequestDtoToEntity(inputItemRequestDto);
@@ -41,6 +42,7 @@ public class ItemRequestServiceImpl {
         return outputItemRequestDto;
     }
 
+    @Override
     public List<OutputItemRequestDto> getAllOwn(Long userId) {
         userService.checkIsObjectInStorage(userId);
         List<ItemRequest> requestsList = itemRequestRepository.findAllByRequestorOrderByCreatedDesc(userId);
@@ -56,6 +58,7 @@ public class ItemRequestServiceImpl {
         }
     }
 
+    @Override
     public List<OutputItemRequestDto> getAll(Long userId, int from, int size) {
         userService.checkIsObjectInStorage(userId);
         int page = from / size;
@@ -68,6 +71,7 @@ public class ItemRequestServiceImpl {
         return result;
     }
 
+    @Override
     public OutputItemRequestDto getById(Long userId, Long requestId) {
         userService.checkIsObjectInStorage(userId);
         checkIsObjectInStorage(requestId);
@@ -77,6 +81,7 @@ public class ItemRequestServiceImpl {
         return result;
     }
 
+    @Override
     public ItemRequest findById(Long requestId) {
         Optional<ItemRequest> optionalRequest = itemRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {

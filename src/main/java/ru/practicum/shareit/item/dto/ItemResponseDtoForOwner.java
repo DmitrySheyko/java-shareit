@@ -6,11 +6,9 @@ import ru.practicum.shareit.booking.dto.BookingItemDto;
 import java.util.List;
 
 @Getter
-@Setter
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class ItemResponseDtoForOwner implements ResponseDto {
     private Long id;
     private String name;

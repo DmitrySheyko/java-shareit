@@ -9,7 +9,6 @@ import ru.practicum.shareit.request.dto.OutputItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,13 +42,6 @@ public class ItemRequestMapper {
             result.setCreated(instantToString(itemRequest.getCreated()));
             result.setItems(getAnswerDtoList(itemRequest));
             return result;
-//            return OutputItemRequestDto.builder()
-//                    .description(itemRequest.getDescription())
-//                    .created(instantToString(itemRequest.getCreated()))
-//                    .answersList(itemRequest.getAnswersList().stream()
-//                            .map(this::itemToAnswerDto)
-//                            .collect(Collectors.toList()))
-//                    .build();
         }
     }
 
@@ -58,24 +50,12 @@ public class ItemRequestMapper {
         return DATE_TIME_PATTERN.withZone(ZoneId.systemDefault()).format(zonedDateTime);
     }
 
-    private Instant stringToInstant(String stringTime) {
-        LocalDateTime localDateTime = LocalDateTime.parse(stringTime, DATE_TIME_PATTERN);
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
-        return zonedDateTime.toInstant();
-    }
-
     private AnswerDto itemToAnswerDto(Item item) {
         if (item == null) {
             return null;
         } else {
-            return AnswerDto.builder()
-                    .id(item.getId())
-                    .name(item.getName())
-                    .requestId(item.getRequestId())
-                    .description(item.getDescription())
-                    .available(item.getAvailable())
-                    .owner(item.getOwner())
-                    .build();
+            return AnswerDto.builder().id(item.getId()).name(item.getName()).requestId(item.getRequestId())
+                    .description(item.getDescription()).available(item.getAvailable()).owner(item.getOwner()).build();
         }
     }
 

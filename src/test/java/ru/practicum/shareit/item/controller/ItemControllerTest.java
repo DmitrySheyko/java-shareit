@@ -52,8 +52,7 @@ class ItemControllerTest {
         ItemResponseDto responseDtoForAdd = ItemResponseDto.builder()
                 .id(1L).name("Test name").description("Test description").available(true).build();
 
-        when(itemService.add(requestDtoForAdd))
-                .thenReturn(responseDtoForAdd);
+        when(itemService.add(requestDtoForAdd)).thenReturn(responseDtoForAdd);
 
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(requestBody))
@@ -74,8 +73,7 @@ class ItemControllerTest {
         ItemResponseDto responseDtoForUpdate = ItemResponseDto.builder()
                 .id(1L).name("Test name").description("Test description").available(true).build();
 
-        when(itemService.update(requestDtoForUpdate))
-                .thenReturn(responseDtoForUpdate);
+        when(itemService.update(requestDtoForUpdate)).thenReturn(responseDtoForUpdate);
 
         mvc.perform(patch("/items/{id}", 1)
                         .content(mapper.writeValueAsString(requestBody))
@@ -92,8 +90,7 @@ class ItemControllerTest {
         ItemResponseDto responseDtoForGetById = ItemResponseDto.builder()
                 .id(1L).name("Test name").description("Test description").available(true).build();
 
-        when(itemService.getById(1L, 1L))
-                .thenReturn(responseDtoForGetById);
+        when(itemService.getById(1L, 1L)).thenReturn(responseDtoForGetById);
 
         mvc.perform(get("/items/{id}", 1)
                         .header("X-Sharer-User-Id", 1)
@@ -112,8 +109,7 @@ class ItemControllerTest {
                 .id(2L).name("Test name2").description("Test description2").available(true).build();
         List<ItemResponseDtoForOwner> result = List.of(response1, response2);
 
-        when(itemService.getAllByOwner(1L, 0, 10))
-                .thenReturn(result);
+        when(itemService.getAllByOwner(1L, 0, 10)).thenReturn(result);
 
         mvc.perform(get("/items", 1)
                         .header("X-Sharer-User-Id", 1)
@@ -134,8 +130,7 @@ class ItemControllerTest {
                 .id(2L).name("Test name2 search").description("Test description2").available(true).build();
         List<ItemResponseDto> result = List.of(response1, response2);
 
-        when(itemService.search("search", 0, 10))
-                .thenReturn(result);
+        when(itemService.search("search", 0, 10)).thenReturn(result);
 
         mvc.perform(get("/items/search", 1)
                         .param("text", "search")
@@ -162,8 +157,7 @@ class ItemControllerTest {
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
                 .id(1L).text("Текст комментария про издедие").authorName("User name").build();
 
-        when(itemService.addComment(commentRequestDto))
-                .thenReturn(commentResponseDto);
+        when(itemService.addComment(commentRequestDto)).thenReturn(commentResponseDto);
 
         mvc.perform(post("/items/{itemId}/comment", 1)
                         .content("               Текст комментария про издедие   ")

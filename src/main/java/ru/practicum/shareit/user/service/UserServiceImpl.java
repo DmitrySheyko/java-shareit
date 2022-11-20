@@ -22,10 +22,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = userMapper.dtoForOtherUsersToEntity(userDto);
+        User user = userMapper.userDtoToEntity(userDto);
         User createdUser = userRepository.save(user);
         log.info(String.format("Пользователь id=%s успешно добавлен.", createdUser.getId()));
-        return userMapper.toDtoForOtherUsers(createdUser);
+        return userMapper.toUserDto(createdUser);
     }
 
     @Override
@@ -36,17 +36,17 @@ public class UserServiceImpl implements UserService {
             userDtoForUpdate.setEmail(userFromStorage.getEmail());
         }
         userDtoForUpdate.setName(Optional.ofNullable(userDtoForUpdate.getName()).orElse(userFromStorage.getName()));
-        User userForUpdate = userMapper.dtoForOtherUsersToEntity(userDtoForUpdate);
+        User userForUpdate = userMapper.userDtoToEntity(userDtoForUpdate);
         User updatedUser = userRepository.save(userForUpdate);
         log.info(String.format("Пользователь id=%s успешно обновлен.", userDtoForUpdate.getId()));
-        return userMapper.toDtoForOtherUsers(updatedUser);
+        return userMapper.toUserDto(updatedUser);
     }
 
     @Override
     public UserDto getById(Long userId) {
         checkIsObjectInStorage(userId);
         User user = findById(userId);
-        UserDto result = userMapper.toDtoForOtherUsers(user);
+        UserDto result = userMapper.toUserDto(user);
         log.info(String.format("Получены данные пользователя id=%s.", userId));
         return result;
     }
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAll() {
         List<User> listOfUsers = userRepository.findAll();
         log.info("Получен список всех пользователей");
-        return listOfUsers.stream().map(userMapper::toDtoForOtherUsers).collect(Collectors.toList());
+        return listOfUsers.stream().map(userMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override

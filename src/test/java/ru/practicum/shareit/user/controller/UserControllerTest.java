@@ -47,7 +47,7 @@ class UserControllerTest {
 
     @Test
     void add() throws Exception {
-        // Проерка при корректном UserDto
+
         UserDto userDtoForAdd = UserDto.builder().name("UserName").email("User@email.com").build();
 
         when(userService.add(userDtoForAdd)).thenReturn(userDtoForAdd);
@@ -60,7 +60,6 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDtoForAdd.getId()), Long.class));
 
-        // Проерка при некорректном email
         UserDto wrongUserDtoForAdd = UserDto.builder().name("UserName").email("email.com").build();
 
         mvc.perform(post("/users")
@@ -70,9 +69,7 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
 
-        // Проерка при некорректном name
         UserDto wrongUserDtoForAdd1 = UserDto.builder().name("").email("User@email.com").build();
-
 
         mvc.perform(post("/users")
                         .content(mapper.writeValueAsString(wrongUserDtoForAdd1))

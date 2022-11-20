@@ -22,7 +22,7 @@ class UserServiceImplTest {
     @Test
     void add() {
         String name = "TestName";
-        String email = "Test@amai.com";
+        String email = "Test@email.com";
         UserDto inputUserDto = UserDto.builder().name(name).email(email).build();
         UserDto outputUserDto = userService.add(inputUserDto);
         Assertions.assertNotNull(outputUserDto.getId());
