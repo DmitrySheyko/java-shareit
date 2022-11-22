@@ -17,8 +17,8 @@ import ru.practicum.shareit.request.service.ItemRequestService;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestMapperTest {
-    final ItemRequestMapper itemRequestMapper;
-    final ItemRequestService itemRequestService;
+    private final ItemRequestMapper itemRequestMapper;
+    private final ItemRequestService itemRequestService;
 
     @Test
     void inputItemRequestDtoToEntity() {

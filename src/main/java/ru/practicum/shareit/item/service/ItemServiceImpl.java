@@ -36,12 +36,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Validated
 public class ItemServiceImpl implements ItemService {
-    private ItemRepository itemRepository;
-    private CommentRepository commentRepository;
-    private BookingRepository bookingRepository;
-    private ItemMapper itemMapper;
-    private CommentMapper commentMapper;
-    private UserServiceImpl userServiceImpl;
+    private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
+    private final ItemMapper itemMapper;
+    private final CommentMapper commentMapper;
+    private final UserServiceImpl userServiceImpl;
 
     @Override
     public ItemResponseDto add(@Valid ItemRequestDto itemRequestDto) {
@@ -104,10 +104,9 @@ public class ItemServiceImpl implements ItemService {
                     .collect(Collectors.toList());
             log.info("Список объектов успешно получен.");
             return listOfItemResponseDtoForOwners;
-        } else {
-            log.info("Список объектов пуст.");
-            return Collections.emptyList();
         }
+        log.info("Список объектов пуст.");
+        return Collections.emptyList();
     }
 
     @Override

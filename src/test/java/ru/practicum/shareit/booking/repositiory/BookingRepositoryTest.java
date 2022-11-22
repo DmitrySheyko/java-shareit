@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,9 +18,6 @@ class BookingRepositoryTest {
 
     @Autowired
     private BookingRepository bookingRepository;
-
-    @Autowired
-    TestEntityManager em;
 
     @Test
     void findAllByBookerId() {
@@ -166,8 +162,6 @@ class BookingRepositoryTest {
         Long bookerId = 1L;
         Long itemId = 3L;
         BookingStatus statusRejected = BookingStatus.REJECTED;
-        BookingStatus statusApproved = BookingStatus.APPROVED;
-        BookingStatus statusWaiting = BookingStatus.WAITING;
         int numberOfBookings = 1;
         Long correctBookingId = 7L;
         Instant currentTime = Instant.now();
@@ -176,16 +170,17 @@ class BookingRepositoryTest {
         Assertions.assertEquals(numberOfBookings, result.size());
         Assertions.assertEquals(correctBookingId, result.get(0).getId());
 
+        BookingStatus statusWaiting = BookingStatus.WAITING;
         correctBookingId = 1L;
         result = bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatus(bookerId, itemId,
                 currentTime, statusWaiting);
         Assertions.assertEquals(numberOfBookings, result.size());
         Assertions.assertEquals(correctBookingId, result.get(0).getId());
-//TODO
+
+        BookingStatus statusApproved = BookingStatus.APPROVED;
         result = bookingRepository.findAllByBookerIdAndItemIdAndEndIsBeforeAndStatus(bookerId, itemId,
                 currentTime, statusApproved);
         Assertions.assertEquals(0, result.size());
-
     }
 
     @Test

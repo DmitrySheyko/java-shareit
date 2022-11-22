@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,9 +19,9 @@ class BookingResponseDtoTest {
 
     @Test
     void testBookingResponseDto() throws Exception {
-        User user = User.builder().id(1L).name("UserName").email("User@email.com").build();
-        Item item = Item.builder().id(2L).name("ItemName").description("Item description").owner(3L).available(true)
-                .requestId(4L).build();
+        UserDto user = UserDto.builder().id(1L).name("UserName").email("User@email.com").build();
+        ItemResponseDto item = ItemResponseDto.builder().id(2L).name("ItemName").description("Item description")
+                .available(true).requestId(4L).build();
 
         BookingResponseDto bookingResponseDto = BookingResponseDto.builder()
                 .id(5L)
@@ -28,6 +29,7 @@ class BookingResponseDtoTest {
                 .end("2022-10-10 10:10:10")
                 .item(item)
                 .booker(user)
+                .status(BookingStatus.WAITING)
                 .build();
         JsonContent<BookingResponseDto> result = json.write(bookingResponseDto);
 
@@ -38,7 +40,7 @@ class BookingResponseDtoTest {
         assertThat(result).extractingJsonPathStringValue("$.item.name").isEqualTo("ItemName");
         assertThat(result).extractingJsonPathStringValue("$.item.description")
                 .isEqualTo("Item description");
-        assertThat(result).extractingJsonPathNumberValue("$.item.owner").isEqualTo(3);
+//        assertThat(result).extractingJsonPathNumberValue("$.item.owner").isEqualTo(3);
         assertThat(result).extractingJsonPathBooleanValue("$.item.available").isEqualTo(true);
         assertThat(result).extractingJsonPathNumberValue("$.item.requestId").isEqualTo(4);
         assertThat(result).extractingJsonPathStringValue("$.booker.name").isEqualTo("UserName");

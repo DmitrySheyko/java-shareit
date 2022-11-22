@@ -9,10 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.request.dto.InputItemRequestDto;
 import ru.practicum.shareit.request.dto.OutputItemRequestDto;
-import ru.practicum.shareit.request.itemRequestMapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
 
@@ -22,13 +19,10 @@ import java.util.List;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestServiceImplTest {
-    final ItemRequestServiceImpl itemRequestService;
-    final ItemRequestRepository itemRequestRepository;
-    final ItemRequestMapper itemRequestMapper;
-    final UserServiceImpl userService;
-    String description = "Request description";
-    Long requestor = 2L;
-    Long requestId = 5L;
+    private final ItemRequestServiceImpl itemRequestService;
+    private String description = "Request description";
+    private final Long requestor = 2L;
+    private final Long requestId = 5L;
 
     @Test
     void add() {
@@ -46,7 +40,10 @@ class ItemRequestServiceImplTest {
         Assertions.assertEquals(numberOfRequests, result.size());
 
         Long notExistsRequestor = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemRequestService.getAllOwn(notExistsRequestor));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemRequestService.getAllOwn(notExistsRequestor));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsRequestor),
+                thrown.getMessage());
     }
 
     @Test
@@ -68,8 +65,11 @@ class ItemRequestServiceImplTest {
         Long notExistsRequestor = 100L;
         int from1 = 0;
         int size1 = 10;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemRequestService.getAll(notExistsRequestor,
-                from1, size1));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemRequestService.getAll(notExistsRequestor,
+                        from1, size1));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsRequestor),
+                thrown.getMessage());
     }
 
     @Test
@@ -80,20 +80,25 @@ class ItemRequestServiceImplTest {
         Assertions.assertEquals(description, outputItemRequestDto.getDescription());
 
         Long notExistsRequestor = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemRequestService.getById(notExistsRequestor, requestId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsRequestor),
+                thrown.getMessage());
 
         Long nullRequestor = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemRequestService.getById(nullRequestor, requestId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", nullRequestor), thrown.getMessage());
 
         Long notExistsRequestId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemRequestService.getById(requestor, notExistsRequestId));
+        Assertions.assertEquals(String.format("Заявка Id=%s не найдена", notExistsRequestId), thrown.getMessage());
 
         Long nullRequestId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemRequestService.getById(requestor, nullRequestId));
+        Assertions.assertEquals(String.format("Заявка Id=%s не найдена", nullRequestId), thrown.getMessage());
     }
 
     @Test
@@ -104,11 +109,15 @@ class ItemRequestServiceImplTest {
         Assertions.assertEquals(description, itemRequest.getDescription());
 
         Long notExistsRequestId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemRequestService.findById(notExistsRequestId));
+        Assertions.assertEquals(String.format("Не удалось получить данные по заявке  Id=%S", notExistsRequestId),
+                thrown.getMessage());
 
         Long nullRequestId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemRequestService.findById(nullRequestId));
+        Assertions.assertEquals(String.format("Не удалось получить данные по заявке  Id=%S", nullRequestId),
+                thrown.getMessage());
     }
 }

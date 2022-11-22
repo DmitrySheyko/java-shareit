@@ -6,16 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.mapper.CommentMapper;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -26,13 +21,8 @@ import java.util.List;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemServiceImplTest {
-    final ItemServiceImpl itemService;
-    final ItemRepository itemRepository;
-    final CommentRepository commentRepository;
-    final BookingRepository bookingRepository;
-    final ItemMapper itemMapper;
-    final CommentMapper commentMapper;
-    final UserServiceImpl userServiceImpl;
+    private final ItemServiceImpl itemService;
+    private final ItemRepository itemRepository;
 
     @Test
     void add() {
@@ -51,54 +41,71 @@ class ItemServiceImplTest {
         Long notExistsUserId = 100L;
         ItemRequestDto itemRequestDtoWithNotExistUserId = ItemRequestDto.builder().name(name).description(description)
                 .owner(notExistsUserId).available(available).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.add(itemRequestDtoWithNotExistUserId));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.add(itemRequestDtoWithNotExistUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsUserId), thrown.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenSaveIncorrectName() {
         ItemRequestDto itemRequestDtoWithNullName = ItemRequestDto.builder().description("Test description").owner(1L)
                 .available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithNullName));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithNullName));
+        Assertions.assertEquals("add.itemRequestDto.name: Не указано название", thrown.getMessage());
 
-        ItemRequestDto itemRequestDtoWithEmptyName = ItemRequestDto.builder().name("").description("Test description").owner(1L)
-                .available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithEmptyName));
+        ItemRequestDto itemRequestDtoWithEmptyName = ItemRequestDto.builder().name("").description("Test description")
+                .owner(1L).available(true).build();
+        thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithEmptyName));
+        Assertions.assertEquals("add.itemRequestDto.name: Не указано название", thrown.getMessage());
 
-        ItemRequestDto itemRequestDtoWithBlankName = ItemRequestDto.builder().name(" ").description("Test description").owner(1L)
-                .available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithBlankName));
+        ItemRequestDto itemRequestDtoWithBlankName = ItemRequestDto.builder().name(" ").description("Test description")
+                .owner(1L).available(true).build();
+        thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithBlankName));
+        Assertions.assertEquals("add.itemRequestDto.name: Не указано название", thrown.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenSaveIncorrectDescription() {
         ItemRequestDto itemRequestDtoWithNullDescription = ItemRequestDto.builder().name("TestItem").owner(1L)
                 .available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class,
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
                 () -> itemService.add(itemRequestDtoWithNullDescription));
+        Assertions.assertEquals("add.itemRequestDto.description: Не указано описание", thrown.getMessage());
 
         ItemRequestDto itemRequestDtoWithEmptyDescription = ItemRequestDto.builder().name("TestItem").description("")
                 .owner(1L).available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class,
+        thrown = Assertions.assertThrows(ConstraintViolationException.class,
                 () -> itemService.add(itemRequestDtoWithEmptyDescription));
+        Assertions.assertEquals("add.itemRequestDto.description: Не указано описание", thrown.getMessage());
 
         ItemRequestDto itemRequestDtoWithBlankDescription = ItemRequestDto.builder().name("TestItem").description(" ")
                 .owner(1L).available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class,
+        thrown = Assertions.assertThrows(ConstraintViolationException.class,
                 () -> itemService.add(itemRequestDtoWithBlankDescription));
+        Assertions.assertEquals("add.itemRequestDto.description: Не указано описание",
+                thrown.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenSaveNullAvailable() {
         ItemRequestDto itemRequestDto = ItemRequestDto.builder().name("TestItem").description("Test description")
                 .owner(1L).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDto));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDto));
+        Assertions.assertEquals("add.itemRequestDto.available: must not be null", thrown.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenSaveNullOwner() {
-        ItemRequestDto itemRequestDtoWithNullOwner = ItemRequestDto.builder().name("TestItem").description("Test description")
-                .available(true).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.add(itemRequestDtoWithNullOwner));
+        ItemRequestDto itemRequestDtoWithNullOwner = ItemRequestDto.builder().name("TestItem")
+                .description("Test description").available(true).build();
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.add(itemRequestDtoWithNullOwner));
+        Assertions.assertEquals("add.itemRequestDto.owner: В запросе не предостален id пользователя",
+                thrown.getMessage());
     }
 
     @Test
@@ -132,7 +139,10 @@ class ItemServiceImplTest {
         Boolean available = true;
         ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(name)
                 .description(description).available(available).owner(owner).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemDtoForUpdate));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.update(itemDtoForUpdate));
+        Assertions.assertEquals(String.format("У пользователя userId=%s нет прав редактировать объект itemId=%s", owner,
+                itemId), thrown.getMessage());
     }
 
     @Test
@@ -144,7 +154,9 @@ class ItemServiceImplTest {
         Boolean available = true;
         ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(name)
                 .description(description).available(available).owner(owner).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemDtoForUpdate));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.update(itemDtoForUpdate));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", owner), thrown.getMessage());
     }
 
     @Test
@@ -156,7 +168,9 @@ class ItemServiceImplTest {
         Boolean available = true;
         ItemRequestDto itemDtoForUpdate = ItemRequestDto.builder().id(itemId).name(name)
                 .description(description).available(available).owner(owner).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.update(itemDtoForUpdate));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.update(itemDtoForUpdate));
+        Assertions.assertEquals(String.format("Объект itemId=%s не найден", itemId), thrown.getMessage());
     }
 
     @Test
@@ -164,7 +178,6 @@ class ItemServiceImplTest {
         Long itemId = 1L;
         Long ownerId = 1L;
         Long anotherUserId = 2L;
-
         ResponseDto itemResponseDtoForOwner = itemService.getById(ownerId, itemId);
         ResponseDto itemResponseDto = itemService.getById(anotherUserId, itemId);
         Assertions.assertNotNull(((ItemResponseDtoForOwner) itemResponseDtoForOwner).getLastBooking());
@@ -174,8 +187,12 @@ class ItemServiceImplTest {
 
         Long notExistsItemId = 100L;
         Long notExistsUserId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.getById(ownerId, notExistsUserId));
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.getById(notExistsItemId, itemId));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.getById(ownerId, notExistsUserId));
+        Assertions.assertEquals(String.format("Объект itemId=%s не найден", notExistsUserId), thrown.getMessage());
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.getById(notExistsItemId, itemId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsItemId), thrown.getMessage());
     }
 
     @Test
@@ -199,7 +216,9 @@ class ItemServiceImplTest {
 
         int size = 1;
         Long notExistsOwnerId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.getAllByOwner(notExistsOwnerId, firsPageNumber, size));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.getAllByOwner(notExistsOwnerId, firsPageNumber, size));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsOwnerId), thrown.getMessage());
     }
 
     @Test
@@ -225,7 +244,10 @@ class ItemServiceImplTest {
         String textOfComment = "Text of comment";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ValidationException.class, () -> itemService.addComment(commentForAdd));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals(String.format("Пользователь userId=%s не может оставить комментарий", authorId),
+                thrown.getMessage());
     }
 
     @Test
@@ -235,7 +257,10 @@ class ItemServiceImplTest {
         String textOfComment = "Text of comment";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ValidationException.class, () -> itemService.addComment(commentForAdd));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals(String.format("Пользователь userId=%s не может оставить комментарий", authorId),
+                thrown.getMessage());
     }
 
     @Test
@@ -245,7 +270,9 @@ class ItemServiceImplTest {
         String textOfComment = "Text of comment";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.addComment(commentForAdd));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", authorId), thrown.getMessage());
     }
 
     @Test
@@ -255,7 +282,10 @@ class ItemServiceImplTest {
         String textOfComment = "Text of comment";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals("addComment.commentRequestDto.author: В запросе не предостален id " +
+                "пользователя", thrown.getMessage());
     }
 
     @Test
@@ -265,7 +295,9 @@ class ItemServiceImplTest {
         String textOfComment = "Text of comment";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> itemService.addComment(commentForAdd));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals(String.format("Объект itemId=%s не найден", itemId), thrown.getMessage());
     }
 
     @Test
@@ -275,7 +307,10 @@ class ItemServiceImplTest {
         String textOfComment = "Text of comment";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals("addComment.commentRequestDto.item: В запросе не предостален id объекта",
+                thrown.getMessage());
     }
 
     @Test
@@ -285,7 +320,10 @@ class ItemServiceImplTest {
         String textOfComment = null;
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals("addComment.commentRequestDto.text: Текст комментария не должен быть пустым",
+                thrown.getMessage());
     }
 
     @Test
@@ -295,7 +333,10 @@ class ItemServiceImplTest {
         String textOfComment = "";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals("addComment.commentRequestDto.text: Текст комментария не должен быть пустым",
+                thrown.getMessage());
     }
 
     @Test
@@ -305,7 +346,10 @@ class ItemServiceImplTest {
         String textOfComment = " ";
         CommentRequestDto commentForAdd = CommentRequestDto.builder().text(textOfComment).item(itemId)
                 .author(authorId).build();
-        Assertions.assertThrows(ConstraintViolationException.class, () -> itemService.addComment(commentForAdd));
+        ConstraintViolationException thrown = Assertions.assertThrows(ConstraintViolationException.class,
+                () -> itemService.addComment(commentForAdd));
+        Assertions.assertEquals("addComment.commentRequestDto.text: Текст комментария не должен быть пустым",
+                thrown.getMessage());
     }
 
     @Test
@@ -367,8 +411,9 @@ class ItemServiceImplTest {
         Long existsItemId = 1L;
         Long notExistsItemId = 100L;
         Assertions.assertDoesNotThrow(() -> itemService.checkIsItemInStorage(existsItemId));
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemService.checkIsItemInStorage(notExistsItemId));
+        Assertions.assertEquals(String.format("Объект itemId=%s не найден", notExistsItemId), thrown.getMessage());
     }
 
     @Test
@@ -376,8 +421,9 @@ class ItemServiceImplTest {
         Long availableItemId = 1L;
         Long unAvailableItemId = 2L;
         Assertions.assertDoesNotThrow(() -> itemService.checkIsItemAvailable(availableItemId));
-        Assertions.assertThrows(ValidationException.class,
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class,
                 () -> itemService.checkIsItemAvailable(unAvailableItemId));
+        Assertions.assertEquals(String.format("Объект itemId=%s не доступен", unAvailableItemId), thrown.getMessage());
     }
 
     @Test
@@ -389,7 +435,9 @@ class ItemServiceImplTest {
         Assertions.assertEquals(1L, result.getOwner());
 
         Long notExistsItemId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class,
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemService.findById(notExistsItemId));
+        Assertions.assertEquals(String.format("Информция об объекте itemId=%s не найдена", notExistsItemId),
+                thrown.getMessage());
     }
 }

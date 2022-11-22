@@ -13,11 +13,10 @@ import ru.practicum.shareit.user.model.User;
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserMapperTest {
-    final UserMapper userMapper;
-    final Long id = 1L;
-    final String name = "TestName";
-    final String email = "Test@email.com";
-
+    private final UserMapper userMapper;
+    private final Long id = 1L;
+    private final String name = "TestName";
+    private final String email = "Test@email.com";
 
     @Test
     void toUserDto() {

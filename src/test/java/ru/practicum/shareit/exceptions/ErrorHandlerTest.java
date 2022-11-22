@@ -12,7 +12,7 @@ import java.util.Collections;
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ErrorHandlerTest {
-    final ErrorHandler errorHandler;
+    private final ErrorHandler errorHandler;
 
     @Test
     void handlerOfValidationException() {

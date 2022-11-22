@@ -8,15 +8,16 @@ import ru.practicum.shareit.user.model.User;
 import java.time.Instant;
 
 class BookingTest {
-    User user = User.builder().id(1L).name("UserName1").email("User1@email.com").build();
-    Item item = Item.builder().id(1L).name("Name 1").description("Description 1").owner(1L).available(true)
-            .requestId(1L).build();
-    Booking booking1 = Booking.builder().id(1L).item(item).booker(user)
-            .start(Instant.parse("2020-10-10T10:10:10.00Z")).end(Instant.parse("2020-11-10T10:10:10.00Z"))
+    private final User user = User.builder().id(1L).name("UserName1").email("User1@email.com").build();
+    private final Item item = Item.builder().id(1L).name("Name 1").description("Description 1").owner(1L)
+            .available(true).requestId(1L).build();
+    private final Booking booking1 = Booking.builder().id(1L).item(item).booker(user)
+            .start(Instant.parse("2020-10-10T10:10:10.00Z"))
+            .end(Instant.parse("2020-11-10T10:10:10.00Z"))
             .status(BookingStatus.WAITING).build();
-    Booking booking2 = new Booking(2L, Instant.parse("2021-10-10T10:10:10.00Z"),
+    private final Booking booking2 = new Booking(2L, Instant.parse("2021-10-10T10:10:10.00Z"),
             Instant.parse("2021-11-10T10:10:10.00Z"), item, user, BookingStatus.WAITING);
-    Booking booking3 = booking1;
+    private final Booking booking3 = booking1;
 
     @Test
     void testEquals() {

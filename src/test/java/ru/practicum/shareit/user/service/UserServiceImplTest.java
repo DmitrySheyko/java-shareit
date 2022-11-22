@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,13 +18,20 @@ import java.util.List;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserServiceImplTest {
-    final UserServiceImpl userService;
+    private final UserServiceImpl userService;
+    private final String name = "TestName";
+    private final String email = "Test@email.com";
+    private final String nameForUpdate = "Updated Name";
+    private final String emailForUpdate = "Updated@email.com";
+    private UserDto inputUserDto;
+
+    @BeforeEach
+    void init() {
+        inputUserDto = UserDto.builder().name(name).email(email).build();
+    }
 
     @Test
     void add() {
-        String name = "TestName";
-        String email = "Test@email.com";
-        UserDto inputUserDto = UserDto.builder().name(name).email(email).build();
         UserDto outputUserDto = userService.add(inputUserDto);
         Assertions.assertNotNull(outputUserDto.getId());
         Assertions.assertEquals(inputUserDto.getName(), outputUserDto.getName());
@@ -32,14 +40,8 @@ class UserServiceImplTest {
 
     @Test
     void update() {
-        String name = "TestName";
-        String email = "Test@email.com";
-        UserDto inputUserDto = UserDto.builder().name(name).email(email).build();
         UserDto outputUserDto = userService.add(inputUserDto);
-
         Long userId = outputUserDto.getId();
-        String nameForUpdate = "Updated Name";
-        String emailForUpdate = "Updated@email.com";
         UserDto userDtoForUpdate = UserDto.builder().id(userId).name(nameForUpdate).email(emailForUpdate).build();
         UserDto updatedUserDto = userService.update(userDtoForUpdate);
         Assertions.assertEquals(userId, updatedUserDto.getId());
@@ -50,19 +52,19 @@ class UserServiceImplTest {
     @Test
     void shouldThrowExceptionWhenUpdateWithNullUserId() {
         Long userId = null;
-        String nameForUpdate = "Updated Name";
-        String emailForUpdate = "Updated@email.com";
         UserDto userDtoForUpdate = UserDto.builder().id(userId).name(nameForUpdate).email(emailForUpdate).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.update(userDtoForUpdate));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.update(userDtoForUpdate));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", userId), thrown.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenUpdateWithIncorrectUserId() {
         Long userId = 100L;
-        String nameForUpdate = "Updated Name";
-        String emailForUpdate = "Updated@email.com";
         UserDto userDtoForUpdate = UserDto.builder().id(userId).name(nameForUpdate).email(emailForUpdate).build();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.update(userDtoForUpdate));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.update(userDtoForUpdate));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", userId), thrown.getMessage());
     }
 
     @Test
@@ -76,10 +78,13 @@ class UserServiceImplTest {
         Assertions.assertEquals(userEmail, userFromBd.getEmail());
 
         Long notExistsUserId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.getById(notExistsUserId));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.getById(notExistsUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsUserId), thrown.getMessage());
 
         Long nullUserId = null;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.getById(nullUserId));
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.getById(nullUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", nullUserId), thrown.getMessage());
     }
 
     @Test
@@ -98,8 +103,6 @@ class UserServiceImplTest {
 
     @Test
     void delete() {
-        String name = "TestName";
-        String email = "Test@email.com";
         List<UserDto> userDtoList = userService.getAll();
         int numberOfUsers = userDtoList.size();
         UserDto outputUserDto = userService.add(UserDto.builder().name(name).email(email).build());
@@ -110,10 +113,13 @@ class UserServiceImplTest {
         Assertions.assertEquals(numberOfUsers, userDtoList.size());
 
         Long notExistsUserId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.delete(notExistsUserId));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.delete(notExistsUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsUserId), thrown.getMessage());
 
         Long nullUserId = null;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.delete(nullUserId));
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.delete(nullUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", nullUserId), thrown.getMessage());
     }
 
     @Test
@@ -122,10 +128,14 @@ class UserServiceImplTest {
         Assertions.assertDoesNotThrow(() -> userService.checkIsObjectInStorage(existsUserId));
 
         Long notExistsUserId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.checkIsObjectInStorage(notExistsUserId));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.checkIsObjectInStorage(notExistsUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", notExistsUserId), thrown.getMessage());
 
         Long nullUserId = null;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.checkIsObjectInStorage(nullUserId));
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.checkIsObjectInStorage(nullUserId));
+        Assertions.assertEquals(String.format("Пользователь id=%s не найден.", nullUserId), thrown.getMessage());
     }
 
     @Test
@@ -139,9 +149,14 @@ class UserServiceImplTest {
         Assertions.assertEquals(userEmail, userFromBd.getEmail());
 
         Long notExistsUserId = 100L;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.findById(notExistsUserId));
+        ObjectNotFoundException thrown = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> userService.findById(notExistsUserId));
+        Assertions.assertEquals(String.format("Данные пользователя id=%s не найдены.", notExistsUserId),
+                thrown.getMessage());
 
         Long nullUserId = null;
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.findById(nullUserId));
+        thrown = Assertions.assertThrows(ObjectNotFoundException.class, () -> userService.findById(nullUserId));
+        Assertions.assertEquals(String.format("Данные пользователя id=%s не найдены.", nullUserId),
+                thrown.getMessage());
     }
 }

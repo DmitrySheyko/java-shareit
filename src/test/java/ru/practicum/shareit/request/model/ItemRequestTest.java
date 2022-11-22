@@ -9,13 +9,13 @@ import java.util.Collections;
 import java.util.List;
 
 class ItemRequestTest {
-    Item item = Item.builder().id(1L).name("Name 1").description("Description 1").owner(1L).available(true)
-            .requestId(1L).build();
-    ItemRequest itemRequest1 = ItemRequest.builder().id(1L).description("Description").requestor(2L)
+    private final Item item = Item.builder().id(1L).name("Name 1").description("Description 1").owner(1L)
+            .available(true).requestId(1L).build();
+    private final ItemRequest itemRequest1 = ItemRequest.builder().id(1L).description("Description").requestor(2L)
             .created(Instant.now()).answersList(List.of(item)).build();
-    ItemRequest itemRequest2 = new ItemRequest(2L, "Description", 2L, Instant.now(),
-            Collections.emptyList());
-    ItemRequest itemRequest3 = itemRequest1;
+    private final ItemRequest itemRequest2 = new ItemRequest(2L, "Description", 2L,
+            Instant.now(), Collections.emptyList());
+    private final ItemRequest itemRequest3 = itemRequest1;
 
     @Test
     void testEquals() {

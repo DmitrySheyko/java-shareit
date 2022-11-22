@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,12 +9,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.request.dto.InputItemRequestDto;
-import ru.practicum.shareit.request.itemRequestMapper.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.OutputItemRequestDto;
+import ru.practicum.shareit.request.itemRequestMapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
-
 
 import java.time.Instant;
 import java.util.Collections;
@@ -27,9 +25,9 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
-    ItemRequestRepository itemRequestRepository;
-    ItemRequestMapper itemRequestMapper;
-    UserServiceImpl userService;
+    private final ItemRequestRepository itemRequestRepository;
+    private final ItemRequestMapper itemRequestMapper;
+    private final UserServiceImpl userService;
 
     @Override
     public OutputItemRequestDto add(InputItemRequestDto inputItemRequestDto) {
@@ -49,13 +47,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (requestsList.isEmpty()) {
             log.info(String.format("Список заявок пользователя id=%s пуст", userId));
             return Collections.emptyList();
-        } else {
-            List<OutputItemRequestDto> result = requestsList.stream()
-                    .map(itemRequest -> itemRequestMapper.entityToOutputItemRequestDto(itemRequest))
-                    .collect(Collectors.toList());
-            log.info(String.format("Список заявок пользователя id=%s успешно получен", userId));
-            return result;
         }
+        List<OutputItemRequestDto> result = requestsList.stream()
+                .map(itemRequestMapper::entityToOutputItemRequestDto)
+                .collect(Collectors.toList());
+        log.info(String.format("Список заявок пользователя id=%s успешно получен", userId));
+        return result;
     }
 
     @Override
@@ -65,7 +62,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
         Page<ItemRequest> requestsPage = itemRequestRepository.findAllByRequestorNot(pageable, userId);
         List<OutputItemRequestDto> result = requestsPage.stream()
-                .map(itemRequest -> itemRequestMapper.entityToOutputItemRequestDto(itemRequest))
+                .map(itemRequestMapper::entityToOutputItemRequestDto)
                 .collect(Collectors.toList());
         log.info(String.format("Список заявок page=%s, size=%s успешно получен", from, size));
         return result;
