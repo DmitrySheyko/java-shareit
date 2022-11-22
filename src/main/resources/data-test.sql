@@ -12,21 +12,16 @@ VALUES ('Request1 description', 1, '2022-01-01T10:10:10'),
        ('Request5 description', 2, '2022-05-01T10:10:10');
 
 INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item1', 'Description1', true, 1);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item11', 'Description11 for search', false, 1);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item2', 'Description2', true, 2);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item22', 'Description22 for SEARCH', true, 2);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item3', 'Description3', true, 3);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID)
-VALUES ('Item33', 'Description33 for SeaRcH', true, 3);
+VALUES ('Item1', 'Description1', true, 1),
+       ('Item11', 'Description11 for search', false, 1),
+       ('Item2', 'Description2', true, 2),
+       ('Item22', 'Description22 for SEARCH', true, 2),
+       ('Item3', 'Description3', true, 3),
+       ('Item33', 'Description33 for SeaRcH', true, 3);
+
 INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID, REQUEST_ID)
-VALUES ('Item4 forsearch', 'Description4', true, 4, 1);
-INSERT INTO items(NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID, REQUEST_ID)
-VALUES ('Item44', 'Description44', true, 4, 1);
+VALUES ('Item4 forsearch', 'Description4', true, 4, 1),
+       ('Item44', 'Description44', true, 4, 1);
 
 INSERT INTO bookings(start_date, end_date, item_id, booker_id, status)
 VALUES ('2021-01-09T10:10:10', '2021-06-01T10:10:10', 3, 1, 0),
