@@ -22,80 +22,64 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        User user = userMapper.dtoForOtherUsersToEntity(userDto);
+        User user = userMapper.userDtoToEntity(userDto);
         User createdUser = userRepository.save(user);
         log.info(String.format("Пользователь id=%s успешно добавлен.", createdUser.getId()));
-        return userMapper.toDtoForOtherUsers(createdUser);
+        return userMapper.toUserDto(createdUser);
     }
 
     @Override
     public UserDto update(UserDto userDtoForUpdate) {
-        checkIsUserInStorage(userDtoForUpdate.getId());
-        User userFromStorage;
-        Optional<User> optionalUserFromStorage = userRepository.findById(userDtoForUpdate.getId());
-        if (optionalUserFromStorage.isPresent()) {
-            userFromStorage = optionalUserFromStorage.get();
-        } else {
-            log.warn(String.format("Данные пользователя id=%s не найдены.", userDtoForUpdate.getId()));
-            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.",
-                    userDtoForUpdate.getId()));
-        }
+        checkIsObjectInStorage(userDtoForUpdate.getId());
+        User userFromStorage = findById(userDtoForUpdate.getId());
         if (userDtoForUpdate.getEmail() == null) {
             userDtoForUpdate.setEmail(userFromStorage.getEmail());
         }
         userDtoForUpdate.setName(Optional.ofNullable(userDtoForUpdate.getName()).orElse(userFromStorage.getName()));
-        User userForUpdate = userMapper.dtoForOtherUsersToEntity(userDtoForUpdate);
+        User userForUpdate = userMapper.userDtoToEntity(userDtoForUpdate);
         User updatedUser = userRepository.save(userForUpdate);
         log.info(String.format("Пользователь id=%s успешно обновлен.", userDtoForUpdate.getId()));
-        return userMapper.toDtoForOtherUsers(updatedUser);
+        return userMapper.toUserDto(updatedUser);
     }
 
     @Override
-    public UserDto getById(Long userId) throws ObjectNotFoundException {
-        if (userRepository.existsById(userId)) {
-            Optional<User> optionalUser = userRepository.findById(userId);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                log.info(String.format("Получены данные пользователя id=%s.", userId));
-                return userMapper.toDtoForOtherUsers(user);
-            } else {
-                log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
-                throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
-            }
-        } else {
-            log.warn(String.format("Пользователь id=%s не найден.", userId));
-            throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
-        }
+    public UserDto getById(Long userId) {
+        checkIsObjectInStorage(userId);
+        User user = findById(userId);
+        UserDto result = userMapper.toUserDto(user);
+        log.info(String.format("Получены данные пользователя id=%s.", userId));
+        return result;
     }
 
     @Override
     public List<UserDto> getAll() {
         List<User> listOfUsers = userRepository.findAll();
-        log.info("Получены список всех пользователей");
-        return listOfUsers.stream().map(userMapper::toDtoForOtherUsers).collect(Collectors.toList());
+        log.info("Получен список всех пользователей");
+        return listOfUsers.stream().map(userMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
     public String delete(Long userId) {
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
-            log.info(String.format("Пользователь id=%s успешно удален", userId));
-            return String.format("Пользователь id=%s успешно удален", userId);
-        } else {
+        checkIsObjectInStorage(userId);
+        userRepository.deleteById(userId);
+        log.info(String.format("Пользователь id=%s успешно удален", userId));
+        return String.format("Пользователь id=%s успешно удален", userId);
+    }
+
+    @Override
+    public void checkIsObjectInStorage(Long userId) {
+        if (!(userId != null && userRepository.existsById(userId))) {
             log.warn(String.format("Пользователь id=%s не найден.", userId));
             throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
         }
     }
 
     @Override
-    public void checkIsUserInStorage(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            log.warn(String.format("Пользователь id=%s не найден.", userId));
-            throw new ObjectNotFoundException(String.format("Пользователь id=%s не найден.", userId));
-        }
-    }
-
     public User findById(Long userId) {
+        if (userId == null) {
+            log.warn(String.format("Данные пользователя id=%s не найдены.", userId));
+            throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
+        }
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();

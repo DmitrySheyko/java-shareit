@@ -3,20 +3,21 @@ package ru.practicum.shareit.item.service;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface ItemService {
-    ItemResponseResponseDto add(ItemRequestDto itemRequestDto);
+    ItemResponseDto add(@Valid ItemRequestDto itemRequestDto);
 
-    ItemResponseResponseDto update(ItemRequestDto itemRequestDto);
+    ItemResponseDto update(ItemRequestDto itemRequestDto);
 
     ResponseDto getById(Long userId, Long itemId);
 
-    List<ItemResponseResponseDtoForOwner> getAllByOwner(Long userId);
+    List<ItemResponseDtoForOwner> getAllByOwner(Long userId, int from, int size);
 
-    CommentResponseDto addComment(CommentRequestDto commentRequestDto);
+    CommentResponseDto addComment(@Valid CommentRequestDto commentRequestDto);
 
-    List<ItemResponseResponseDto> search(String text);
+    List<ItemResponseDto> search(String text, int from, int size);
 
     String delete(Long userId);
 

@@ -1,8 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 
 import java.util.List;
 
@@ -12,13 +11,13 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemResponseResponseDtoForOwner implements ResponseDto {
+public class ItemResponseDto implements ResponseDto {
     private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private ItemRequest request;
-    private Booking lastBooking;
-    private Booking nextBooking;
+    private BookingItemDto lastBooking;
+    private BookingItemDto nextBooking;
     private List<CommentResponseDto> comments;
+    private Long requestId;
 }

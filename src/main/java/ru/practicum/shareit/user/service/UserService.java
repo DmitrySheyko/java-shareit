@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ public interface UserService {
 
     String delete(Long userId);
 
-    void checkIsUserInStorage(Long userId);
+    void checkIsObjectInStorage(Long userId);
+
+    User findById(Long userId);
 
 }

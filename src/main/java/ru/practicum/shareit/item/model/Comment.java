@@ -10,7 +10,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity (name = "comments")
+@Entity(name = "comments")
 @Table
 public class Comment {
     @Id
@@ -36,21 +36,12 @@ public class Comment {
 
         Comment comment = (Comment) o;
 
-        if (!id.equals(comment.id)) return false;
-        if (!text.equals(comment.text)) return false;
-        if (!item.equals(comment.item)) return false;
-        if (!author.equals(comment.author)) return false;
-        return created.equals(comment.created);
+        return id.equals(comment.id);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + text.hashCode();
-        result = 31 * result + item.hashCode();
-        result = 31 * result + author.hashCode();
-        result = 31 * result + created.hashCode();
-        return result;
+        return id.hashCode();
     }
 }
 
