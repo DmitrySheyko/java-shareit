@@ -73,7 +73,6 @@ public class ItemMapper {
             return null;
         } else {
             Booking booking = listOfBookings.get(0);
-            System.out.println(booking);  //TODO
             return BookingItemDto.builder()
                     .id(booking.getId())
                     .bookerId(booking.getBooker().getId())

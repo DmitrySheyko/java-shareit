@@ -51,7 +51,6 @@ public class Booking {
         return id.hashCode();
     }
 
-    @Override  //TODO
     public String toString() {
         return "Booking{" +
                 "id=" + id +
