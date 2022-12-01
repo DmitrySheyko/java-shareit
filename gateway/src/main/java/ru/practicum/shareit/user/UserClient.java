@@ -11,6 +11,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 
+import java.util.Optional;
+
 @Service
 @Validated
 public class UserClient extends BaseClient {
@@ -34,12 +36,8 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> update(Long userId, UserRequestDto requestDto) {
-        if (requestDto.getName() != null) {
-            userRequestDto.checkName(requestDto.getName());
-        }
-        if (requestDto.getEmail() != null) {
-            userRequestDto.checkEmail(requestDto.getEmail());
-        }
+        Optional.ofNullable(requestDto.getName()).ifPresent(userRequestDto::checkName);
+        Optional.ofNullable(requestDto.getEmail()).ifPresent(userRequestDto::checkEmail);
         return patch("/" + userId, requestDto);
     }
 

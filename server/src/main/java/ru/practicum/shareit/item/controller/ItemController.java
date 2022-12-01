@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
@@ -12,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
-@Validated
 public class ItemController {
     private final ItemService itemService;
 
@@ -41,18 +39,16 @@ public class ItemController {
     @GetMapping
     public List<ItemResponseDtoForOwner> findAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                         @RequestParam(value = "from", required = false,
-                                                                        defaultValue = "0") int from,
+                                                                defaultValue = "0") int from,
                                                         @RequestParam(value = "size", required = false,
-                                                                        defaultValue = "10") int size) {
+                                                                defaultValue = "10") int size) {
         return itemService.getAllByOwner(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemResponseDto> search(@PathParam("text") String text,
-                                        @RequestParam(value = "from", required = false,
-                                                        defaultValue = "0") int from,
-                                        @RequestParam(value = "size", required = false,
-                                                        defaultValue = "10") int size) {
+                                        @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                                        @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         return itemService.search(text, from, size);
     }
 

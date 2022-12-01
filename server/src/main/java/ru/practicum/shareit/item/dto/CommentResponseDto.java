@@ -1,14 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class CommentResponseDto {
     private Long id;
     private String text;

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.exceptions;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,11 +17,11 @@ public class ErrorHandler {
         return new Error(e.getMessage());
     }
 
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public Error handlerOfConstraintValidationException(final ConstraintViolationException e) {
-//        return new Error(e.getMessage());
-//    }
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Error handlerOfConstraintValidationException(final ConstraintViolationException e) {
+        return new Error(e.getMessage());
+    }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ObjectNotFoundException.class)

@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,11 +60,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String delete(Long userId) {
+    public Map<String, Long> delete(Long userId) {
         checkIsObjectInStorage(userId);
         userRepository.deleteById(userId);
         log.info(String.format("Пользователь id=%s успешно удален", userId));
-        return String.format("Пользователь id=%s успешно удален", userId);
+        return Map.of("Успешно удален пользователь id=", userId );
     }
 
     @Override

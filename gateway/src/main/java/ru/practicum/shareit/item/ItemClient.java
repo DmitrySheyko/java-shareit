@@ -6,16 +6,15 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
-@Validated
 public class ItemClient extends BaseClient {
     private final ItemRequestDto itemRequestDto;
     private static final String API_PREFIX = "/items";
@@ -38,12 +37,8 @@ public class ItemClient extends BaseClient {
 
     public ResponseEntity<Object> update(Long userId, Long itemId, ItemRequestDto requestDto) {
         itemRequestDto.checkRequestDto(requestDto);
-        if (requestDto.getName() != null) {
-            itemRequestDto.checkName(requestDto.getName());
-        }
-        if (requestDto.getDescription() != null) {
-            itemRequestDto.checkDescription(requestDto.getDescription());
-        }
+        Optional.ofNullable(requestDto.getName()).ifPresent(itemRequestDto::checkName);
+        Optional.ofNullable(requestDto.getDescription()).ifPresent(itemRequestDto::checkDescription);
         return patch("/" + itemId, userId, requestDto);
     }
 

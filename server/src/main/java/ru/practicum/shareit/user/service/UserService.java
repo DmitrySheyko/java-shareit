@@ -5,6 +5,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     UserDto add(UserDto userDto);
@@ -15,7 +16,7 @@ public interface UserService {
 
     List<UserDto> getAll();
 
-    String delete(Long userId);
+    Map<String, Long> delete(Long userId);
 
     void checkIsObjectInStorage(Long userId);
 

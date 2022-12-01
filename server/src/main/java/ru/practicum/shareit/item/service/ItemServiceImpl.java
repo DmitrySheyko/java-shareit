@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-@Validated
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
@@ -121,8 +119,10 @@ public class ItemServiceImpl implements ItemService {
                     savedComment.getId(), savedComment.getItem(), commentRequestDto.getAuthor()));
             return result;
         } else {
-            log.warn(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
-            throw new ValidationException(String.format("Пользователь userId=%s не может оставить комментарий", commentRequestDto.getAuthor()));
+            log.warn(String.format("Пользователь userId=%s не может оставить комментарий",
+                    commentRequestDto.getAuthor()));
+            throw new ValidationException(String.format("Пользователь userId=%s не может оставить комментарий",
+                    commentRequestDto.getAuthor()));
         }
     }
 

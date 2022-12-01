@@ -6,6 +6,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -35,14 +36,8 @@ public class UserController {
         return userService.getAll();
     }
 
-//    @DeleteMapping("/{id}")
-//    public String delete(@PathVariable(value = "id") Long userId) {
-//        return userService.delete(userId);
-//    }
-
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable(value = "id") Long userId) {
-        userService.delete(userId);
+    public Map<String, Long> delete(@PathVariable(value = "id") Long userId) {
+       return userService.delete(userId);
     }
 }
-//headers = "Content-Type: application/json; charset=UTF-8")

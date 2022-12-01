@@ -50,15 +50,4 @@ public class Booking {
     public int hashCode() {
         return id.hashCode();
     }
-
-    public String toString() {
-        return "Booking{" +
-                "id=" + id +
-                ", start=" + start +
-                ", end=" + end +
-                ", item=" + item +
-                ", booker=" + booker +
-                ", status=" + status +
-                '}';
-    }
 }

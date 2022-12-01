@@ -7,6 +7,7 @@ import lombok.*;
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class CommentRequestDto {
     private Long id;
     private String text;

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
@@ -16,7 +15,6 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-@Validated
 @AllArgsConstructor
 public class ItemMapper {
     private final BookingRepository bookingRepository;
