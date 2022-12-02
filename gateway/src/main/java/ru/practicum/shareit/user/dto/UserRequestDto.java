@@ -24,6 +24,15 @@ public class UserRequestDto {
     @Email(message = "Указан некорректный email пользователя")
     private String email;
 
+    @Override
+    public String toString() {
+        return "User {" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
     public void checkName(@Valid String name) {
         this.name = name;
     }

@@ -30,6 +30,18 @@ public class ItemRequestDto {
     @Positive(message = "Указан некорректный Id запроса на основе которого добавлен объект")
     private Long requestId;
 
+    @Override
+    public String toString() {
+        return "Item {" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", owner=" + owner +
+                ", available=" + available +
+                ", requestId=" + requestId +
+                '}';
+    }
+
     public void checkName(@Valid String name) {
         this.name = name;
     }

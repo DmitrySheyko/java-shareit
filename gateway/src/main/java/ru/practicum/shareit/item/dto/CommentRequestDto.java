@@ -17,4 +17,14 @@ public class CommentRequestDto {
     private String text;
     private Long item;
     private Long author;
+
+    @Override
+    public String toString() {
+        return "Comment {" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", item=" + item +
+                ", author=" + author +
+                '}';
+    }
 }

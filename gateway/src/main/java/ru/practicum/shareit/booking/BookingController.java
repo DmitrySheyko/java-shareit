@@ -24,7 +24,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Object> add(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                       @RequestBody @Valid BookItemRequestDto requestDto) {
-        log.info("Creating booking {}, userId={}", requestDto, userId);
+        log.info("Создание бронирования {} пользователем userId={}", requestDto, userId);
         return bookingClient.add(userId, requestDto);
     }
 
@@ -32,13 +32,14 @@ public class BookingController {
     public ResponseEntity<Object> update(@Positive @RequestHeader("X-Sharer-User-Id") Long userId,
                                          @Positive @PathVariable(value = "bookingId") Long bookingId,
                                          @RequestParam(value = "approved") Boolean isApproved) {
+        log.info("Обновление бронирование bookingId={} пользователем userId={}", bookingId, userId);
         return bookingClient.update(userId, bookingId, isApproved);
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<Object> getById(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                           @Positive @PathVariable Long bookingId) {
-        log.info("Get booking {}, userId={}", bookingId, userId);
+        log.info("Получение информации о бронировании bookingId={}, пользователем userId={}", bookingId, userId);
         return bookingClient.getById(userId, bookingId);
     }
 
@@ -46,10 +47,13 @@ public class BookingController {
     public ResponseEntity<Object> getAllBookingsByBookerId(@Positive @RequestHeader("X-Sharer-User-Id") Long userId,
                                                            @RequestParam(value = "state", defaultValue = "ALL")
                                                            String stateParam,
-                                                           @PositiveOrZero @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                                           @Positive @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                                                           @PositiveOrZero @RequestParam(value = "from",
+                                                                   required = false, defaultValue = "0") int from,
+                                                           @Positive @RequestParam(value = "size", required = false,
+                                                                   defaultValue = "10") int size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+        log.info("Получение списка бронирований созданных пользователем userId={}", userId);
         return bookingClient.getAllBookingsByBookerId(userId, state, from, size);
     }
 
@@ -57,10 +61,13 @@ public class BookingController {
     public ResponseEntity<Object> getAllBookingsByOwnerItems(@Positive @RequestHeader("X-Sharer-User-Id") Long userId,
                                                              @RequestParam(value = "state", defaultValue = "ALL")
                                                              String stateParam,
-                                                             @PositiveOrZero @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                                             @Positive @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                                                             @PositiveOrZero @RequestParam(value = "from",
+                                                                     required = false, defaultValue = "0") int from,
+                                                             @Positive @RequestParam(value = "size", required = false,
+                                                                     defaultValue = "10") int size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+        log.info("Получение списка бронирований на объекты пользователя userId={}", userId);
         return bookingClient.getAllBookingsByOwnerItems(userId, state, from, size);
     }
 }
