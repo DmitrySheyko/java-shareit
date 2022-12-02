@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         checkIsObjectInStorage(userId);
         userRepository.deleteById(userId);
         log.info(String.format("Пользователь id=%s успешно удален", userId));
-        return Map.of("Успешно удален пользователь id=", userId );
+        return Map.of("Успешно удален пользователь id=", userId);
     }
 
     @Override
