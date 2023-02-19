@@ -7,7 +7,13 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Interface of service class for entity {@link User}
+ *
+ * @author DmitrySheyko
+ */
 public interface UserService {
+
     UserDto add(UserDto userDto);
 
     UserDto update(UserDto userDtoForUpdate);

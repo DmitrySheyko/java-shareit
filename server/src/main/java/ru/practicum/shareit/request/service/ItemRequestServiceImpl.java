@@ -21,10 +21,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Class of service class for entity {@link ItemRequest}.
+ * Implements interface ItemRequestService.
+ *
+ * @author DmitrySheyko
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
+
     private final ItemRequestRepository itemRequestRepository;
     private final ItemRequestMapper itemRequestMapper;
     private final UserServiceImpl userService;
@@ -95,4 +102,5 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new ObjectNotFoundException(String.format("Заявка Id=%s не найдена", requestId));
         }
     }
+
 }

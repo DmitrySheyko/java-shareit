@@ -5,16 +5,24 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.Instant;
 
+/**
+ * Class of entity {@link Comment}.
+ *
+ * @author DmitrySheyko
+ */
+@Entity
+@Table(name = "comments")
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity(name = "comments")
-@Table
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "comment_text", nullable = false, length = 500)
@@ -29,19 +37,5 @@ public class Comment {
     @Column(name = "created", nullable = false)
     private Instant created;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Comment comment = (Comment) o;
-
-        return id.equals(comment.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 }
 

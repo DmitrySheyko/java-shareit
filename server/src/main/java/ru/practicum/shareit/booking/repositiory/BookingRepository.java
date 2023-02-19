@@ -10,6 +10,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interface of JpaRepository for entity {@link Booking}.
+ *
+ * @author DmitrySheyko
+ */
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Page<Booking> findAllByBookerId(Pageable pageable, Long userId);
@@ -42,4 +47,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                                                     BookingStatus state);
 
     Optional<Booking> findByItemIdAndEndAfterAndStartBeforeOrderByStartDesc(Long itemId, Instant start, Instant end);
+
 }

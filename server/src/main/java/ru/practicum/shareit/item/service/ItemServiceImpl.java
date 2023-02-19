@@ -29,10 +29,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Class of service for entity {@link Item}.
+ * Implements interface ItemService.
+ *
+ * @author DmitrySheyko
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
+
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
@@ -188,4 +195,5 @@ public class ItemServiceImpl implements ItemService {
             return optionalItem.get();
         }
     }
+
 }

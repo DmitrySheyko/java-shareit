@@ -14,9 +14,15 @@ import ru.practicum.shareit.item.model.Item;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Mapper class for entity {@link Item}.
+ *
+ * @author DmitrySheyko
+ */
 @Component
 @AllArgsConstructor
 public class ItemMapper {
+
     private final BookingRepository bookingRepository;
 
     public ItemResponseDto toItemResponseDto(Item item, List<CommentResponseDto> listOfComments) {
@@ -89,4 +95,5 @@ public class ItemMapper {
                 .bookerId(booking.getBooker().getId())
                 .build();
     }
+
 }

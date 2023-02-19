@@ -12,9 +12,15 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Mapper class for entity {@link Comment}.
+ *
+ * @author DmitrySheyko
+ */
 @Component
 @AllArgsConstructor
 public class CommentMapper {
+
     private static final DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final UserServiceImpl userServiceImpl;
 
@@ -46,4 +52,5 @@ public class CommentMapper {
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instantTime, ZoneId.systemDefault());
         return DATE_TIME_PATTERN.withZone(ZoneId.systemDefault()).format(zonedDateTime);
     }
+
 }

@@ -7,16 +7,24 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Class of entity {@link ItemRequest}.
+ *
+ * @author DmitrySheyko.
+ */
+@Entity
+@Table(name = "requests")
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "requests")
 public class ItemRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "description")
@@ -32,18 +40,4 @@ public class ItemRequest {
     @JoinColumn(name = "request_id", referencedColumnName = "id")
     private List<Item> answersList;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ItemRequest that = (ItemRequest) o;
-
-        return id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 }

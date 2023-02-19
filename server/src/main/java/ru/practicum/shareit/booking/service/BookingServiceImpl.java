@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.RequestState;
 import ru.practicum.shareit.booking.repositiory.BookingRepository;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -28,10 +29,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Class of service for entity {@link Booking}.
+ * Implements interface {@link BookingService}
+ *
+ * @author DmitrySheyko
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
 public class BookingServiceImpl implements BookingService {
+
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final UserServiceImpl userServiceImpl;
@@ -265,4 +273,5 @@ public class BookingServiceImpl implements BookingService {
         }
         return stateForSearch;
     }
+
 }

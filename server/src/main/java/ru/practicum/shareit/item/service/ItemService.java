@@ -5,7 +5,13 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
+/**
+ * Interface of service class for entity {@link Item}.
+ *
+ * @author DmitrySheyko
+ */
 public interface ItemService {
+
     ItemResponseDto add(ItemRequestDto itemRequestDto);
 
     ItemResponseDto update(ItemRequestDto itemRequestDto);
@@ -25,4 +31,5 @@ public interface ItemService {
     void checkIsItemAvailable(Long itemId);
 
     Item findById(Long itemId);
+
 }

@@ -6,6 +6,11 @@ import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
+/**
+ * Interface of service class for entity {@link ItemRequest}.
+ *
+ * @author DmitrySheyko
+ */
 public interface ItemRequestService {
 
     OutputItemRequestDto add(InputItemRequestDto inputItemRequestDto);
@@ -17,4 +22,5 @@ public interface ItemRequestService {
     OutputItemRequestDto getById(Long userId, Long requestId);
 
     ItemRequest findById(Long requestId);
+
 }

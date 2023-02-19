@@ -4,14 +4,21 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.List;
 
+/**
+ * Class of controller for entity {@link Booking}
+ *
+ * @author DmitrySheyko
+ */
 @RestController
 @RequestMapping(path = "/bookings")
 @AllArgsConstructor
 public class BookingController {
+
     private final BookingService bookingService;
 
     @PostMapping
@@ -55,4 +62,5 @@ public class BookingController {
                                                                        defaultValue = "10") int size) {
         return bookingService.getAllBookingsByOwnerItems(userId, state, from, size);
     }
+
 }

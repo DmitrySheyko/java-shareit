@@ -14,10 +14,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Class of service for entity {@link User}
+ * Implements interface {@link UserService}
+ *
+ * @author DmitrySheyko
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -91,4 +98,5 @@ public class UserServiceImpl implements UserService {
             throw new ObjectNotFoundException(String.format("Данные пользователя id=%s не найдены.", userId));
         }
     }
+
 }

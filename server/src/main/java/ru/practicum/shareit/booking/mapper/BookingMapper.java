@@ -15,9 +15,15 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Mapper class for entity {@link Booking}.
+ *
+ * @author DmitrySheyko
+ */
 @Component
 @AllArgsConstructor
 public class BookingMapper {
+
     private static final DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final UserService userService;
     private final ItemService itemService;
@@ -60,4 +66,5 @@ public class BookingMapper {
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
         return zonedDateTime.toInstant();
     }
+
 }

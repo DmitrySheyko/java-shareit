@@ -3,15 +3,22 @@ package ru.practicum.shareit.item.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
 
+/**
+ * Class of controller for entity {@link Item}.
+ *
+ * @author DmitrySheyko
+ */
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
 public class ItemController {
+
     private final ItemService itemService;
 
     @PostMapping
@@ -60,4 +67,5 @@ public class ItemController {
         commentRequestDto.setItem(itemId);
         return itemService.addComment(commentRequestDto);
     }
+
 }

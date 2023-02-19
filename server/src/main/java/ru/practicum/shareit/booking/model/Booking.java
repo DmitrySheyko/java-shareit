@@ -7,16 +7,24 @@ import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.time.Instant;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+/**
+ * Class of entity {@link Booking}.
+ *
+ * @author DmitrySheyko
+ */
 @Entity
 @Table(name = "bookings")
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Booking {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "start_date", nullable = false)
@@ -36,18 +44,4 @@ public class Booking {
     @Column(name = "status", nullable = false)
     private BookingStatus status;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Booking booking = (Booking) o;
-
-        return id.equals(booking.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
 }

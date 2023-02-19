@@ -6,6 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
+/**
+ * Interface of JpaRepository for entity {@link Item}.
+ *
+ * @author DmitrySheyko
+ */
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
     Page<Item> findAllByOwner(Long userId, Pageable pageable);
@@ -15,4 +20,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "(upper(i.name) like upper(concat('%', ?1, '%')) " +
             " or upper(i.description) like upper(concat('%', ?1, '%')))")
     Page<Item> search(String text, Pageable pageable);
+
 }

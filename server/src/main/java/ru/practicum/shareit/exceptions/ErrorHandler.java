@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Class of error handlers.
+ * Used for handle exceptions.
+ *
+ * @author DmitrySheyko
+ */
 @RestControllerAdvice
 public class ErrorHandler {
 
@@ -40,4 +46,5 @@ public class ErrorHandler {
     public Error handlerExceptions(final Exception e) {
         return new Error(e.getMessage());
     }
+
 }

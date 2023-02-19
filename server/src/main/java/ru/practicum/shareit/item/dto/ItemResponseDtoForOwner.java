@@ -5,9 +5,17 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
+/**
+ * Class of dto for entity {@link Item}.
+ * Used for returning information about Item to owner of item.
+ * Implements interface {@link ResponseDto}.
+ *
+ * @author DmitrySheyko
+ */
 @Getter
 @EqualsAndHashCode
 @Builder

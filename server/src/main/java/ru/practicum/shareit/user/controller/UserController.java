@@ -3,15 +3,22 @@ package ru.practicum.shareit.user.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class of controller for entity {@link User}
+ *
+ * @author DmitrySheyko
+ */
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/users")
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping
@@ -38,6 +45,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public Map<String, Long> delete(@PathVariable(value = "id") Long userId) {
-       return userService.delete(userId);
+        return userService.delete(userId);
     }
+
 }

@@ -4,14 +4,21 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.InputItemRequestDto;
 import ru.practicum.shareit.request.dto.OutputItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.util.List;
 
+/**
+ * Class of controller for entity {@link ItemRequest}.
+ *
+ * @author DmitrySheyko
+ */
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
+
     private final ItemRequestService itemRequestService;
 
     @PostMapping(produces = "application/json;charset=UTF-8")
@@ -40,4 +47,5 @@ public class ItemRequestController {
                                         @PathVariable(value = "id") Long requestId) {
         return itemRequestService.getById(userId, requestId);
     }
+
 }

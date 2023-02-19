@@ -15,8 +15,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class of mapper for entity {@link ItemRequest}.
+ *
+ * @author DmitrySheyko
+ */
 @Component
 public class ItemRequestMapper {
+
     private static final DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public ItemRequest inputItemRequestDtoToEntity(InputItemRequestDto inputItemRequestDto) {
@@ -66,4 +72,5 @@ public class ItemRequestMapper {
                     .collect(Collectors.toList());
         }
     }
+
 }
